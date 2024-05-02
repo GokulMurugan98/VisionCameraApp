@@ -42,15 +42,12 @@ class ViewController: UIViewController {
 //Camera Functions
 
 extension ViewController{
-    
     override func viewDidLayoutSubviews() {
         previewLayer.frame = view.bounds
         shutterButtuon.center = CGPoint(x: view.frame.size.width/2,
                                         y: view.frame.size.height - 100)
     }
-    
     private func checkPermission(){
-        
         switch AVCaptureDevice.authorizationStatus(for: .video){
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) {[weak self] granted in
@@ -69,8 +66,6 @@ extension ViewController{
         @unknown default:
             break
         }
-        
-        
     }
     
     private func setupCamera(){
@@ -85,7 +80,6 @@ extension ViewController{
                 if session.canAddOutput(output){
                     session.addOutput(output)
                 }
-                
                 previewLayer.videoGravity = .resizeAspectFill
                 previewLayer.session = session
                 
@@ -100,7 +94,6 @@ extension ViewController{
     
     @objc func recordPoses(){
         print("Shutter Button Tapped")
-       
     }
 }
 
