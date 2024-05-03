@@ -15,6 +15,8 @@
 		92A17A642BE4267A00C9E230 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A17A632BE4267A00C9E230 /* Assets.xcassets */; };
 		92A17A672BE4267A00C9E230 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 92A17A662BE4267A00C9E230 /* Base */; };
 		92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */; };
+		92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */; };
+		92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A732BE4BDFD00C9E230 /* Feedback.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,8 @@
 		92A17A662BE4267A00C9E230 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		92A17A682BE4267A00C9E230 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
+		92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakinBotViewModel.swift; sourceTree = "<group>"; };
+		92A17A732BE4BDFD00C9E230 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		FA741D83FCA2308D10F25AFE /* Pods_TestCameraApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestCameraApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -75,14 +79,32 @@
 			children = (
 				92A17A5A2BE4267900C9E230 /* AppDelegate.swift */,
 				92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */,
-				92A17A5E2BE4267900C9E230 /* ViewController.swift */,
 				92A17A602BE4267900C9E230 /* Main.storyboard */,
 				92A17A632BE4267A00C9E230 /* Assets.xcassets */,
 				92A17A652BE4267A00C9E230 /* LaunchScreen.storyboard */,
 				92A17A682BE4267A00C9E230 /* Info.plist */,
-				92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */,
+				92A17A702BE4BDB700C9E230 /* Vision Camera View */,
+				92A17A752BE4BE1B00C9E230 /* Networking */,
 			);
 			path = TestCameraApp;
+			sourceTree = "<group>";
+		};
+		92A17A702BE4BDB700C9E230 /* Vision Camera View */ = {
+			isa = PBXGroup;
+			children = (
+				92A17A5E2BE4267900C9E230 /* ViewController.swift */,
+				92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */,
+			);
+			name = "Vision Camera View";
+			sourceTree = "<group>";
+		};
+		92A17A752BE4BE1B00C9E230 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */,
+				92A17A732BE4BDFD00C9E230 /* Feedback.swift */,
+			);
+			path = Networking;
 			sourceTree = "<group>";
 		};
 		E149AA5C37262307B407FD3F /* Pods */ = {
@@ -229,7 +251,9 @@
 			files = (
 				92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */,
 				92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */,
+				92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */,
 				92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */,
+				92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */,
 				92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

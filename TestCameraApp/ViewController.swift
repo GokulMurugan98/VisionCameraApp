@@ -30,15 +30,15 @@ class ViewController: UIViewController {
     }()
     
     //MARK: Vision Variables
-//    //Setting up the ImageView to display video
-//    private lazy var previewOverlayView: UIImageView = {
-//        precondition(isViewLoaded)
-//        let previewOverlayView = UIImageView(frame: .zero)
-//        previewOverlayView.contentMode = UIView.ContentMode.scaleAspectFill
-//        previewOverlayView.translatesAutoresizingMaskIntoConstraints = false
-//        return previewOverlayView
-//    }()
-//    
+    //    //Setting up the ImageView to display video
+    //    private lazy var previewOverlayView: UIImageView = {
+    //        precondition(isViewLoaded)
+    //        let previewOverlayView = UIImageView(frame: .zero)
+    //        previewOverlayView.contentMode = UIView.ContentMode.scaleAspectFill
+    //        previewOverlayView.translatesAutoresizingMaskIntoConstraints = false
+    //        return previewOverlayView
+    //    }()
+    //
     //Setting up the layer to show Lines over a person
     private lazy var annotationOverlayView: UIView = {
         precondition(isViewLoaded)
@@ -52,6 +52,49 @@ class ViewController: UIViewController {
     //Last camera output is stored here
     private var lastFrame: CMSampleBuffer?
     
+    //MARK: API Call Variables
+    
+    var viewModel:SpeakingBotViewModel?
+    
+    var cameraPoses = [[[String: Any]]]()
+    
+    var isPoseDetectionStart:Bool = false
+    
+    let poseTypeOrder: [PoseType] = [
+        .Nose,
+        .LeftEyeInner,
+        .LeftEye,
+        .LeftEyeOuter,
+        .RightEyeInner,
+        .RightEye,
+        .RightEyeOuter,
+        .LeftEar,
+        .RightEar,
+        .MouthLeft,
+        .MouthRight,
+        .LeftShoulder,
+        .RightShoulder,
+        .LeftElbow,
+        .RightElbow,
+        .LeftWrist,
+        .RightWrist,
+        .LeftPinkyFinger,
+        .RightPinkyFinger,
+        .LeftIndexFinger,
+        .RightIndexFinger,
+        .LeftThumb,
+        .RightThumb,
+        .LeftHip,
+        .RightHip,
+        .LeftKnee,
+        .RightKnee,
+        .LeftAnkle,
+        .RightAnkle,
+        .LeftHeel,
+        .RightHeel,
+        .LeftToe,
+        .RightToe
+    ]
     
 }
 
@@ -126,6 +169,13 @@ extension ViewController{
     //This function is called when the shutter button is tapped
     @objc func recordPoses(){
         print("Shutter Button Tapped")
+//        if !isPoseDetectionStart{
+//            cameraPoses = []
+//            isPoseDetectionStart = true
+//        } else {
+//            //sendPoses()
+//            isPoseDetectionStart = false
+//        }
     }
 }
 
@@ -135,7 +185,7 @@ extension ViewController{
     //Base code to setup all the functionalities needed to record the lines over the person
     func setupView(){
         previewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        //previewLayer.videoGravity = .resize
+        previewLayer.videoGravity = .resizeAspectFill
         view.layer.addSublayer(previewLayer)
         //setUpPreviewOverlayView()
         setUpAnnotationOverlayView()
@@ -169,16 +219,16 @@ extension ViewController{
     }
     
     
-//    //Adding the previewlayer (ImageView) to the view
-//    private func setUpPreviewOverlayView() {
-//        view.addSubview(previewOverlayView)
-//        NSLayoutConstraint.activate([
-//            previewOverlayView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//            previewOverlayView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-//            previewOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            previewOverlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//        ])
-//    }
+    //    //Adding the previewlayer (ImageView) to the view
+    //    private func setUpPreviewOverlayView() {
+    //        view.addSubview(previewOverlayView)
+    //        NSLayoutConstraint.activate([
+    //            previewOverlayView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+    //            previewOverlayView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+    //            previewOverlayView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+    //            previewOverlayView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+    //        ])
+    //    }
     
     //Adding the AnnotationLayer (Lines Layer) to the view
     private func setUpAnnotationOverlayView() {
@@ -265,8 +315,6 @@ extension ViewController{
                     strongSelf.view.addSubview(strongSelf.shutterButtuon)
                     strongSelf.startSession()
                 }
-                
-                
             } catch {
                 print("Failed to create capture device input: \(error.localizedDescription)")
             }
@@ -289,13 +337,13 @@ extension ViewController{
                     print("Self is nil!")
                     return
                 }
-                strongSelf.updatePreviewOverlayViewWithLastFrame()
+                strongSelf.removeDetectionAnnotations()
                 if let detectionError = detectionError {
                     print("Failed to detect poses with error: \(detectionError.localizedDescription).")
                     return
                 }
                 guard !poses.isEmpty else {
-                    print("Pose detector returned no results.")
+                    //print("Pose detector returned no results.")
                     return
                 }
                 
@@ -305,13 +353,17 @@ extension ViewController{
                         forPose: pose,
                         inViewWithBounds: strongSelf.annotationOverlayView.bounds,
                         lineWidth: Constant.lineWidth,
-                        dotRadius: Constant.smallDotRadius,
+                        smallDotRadius: Constant.smallDotRadius,
+                        bigDotRadius: Constant.bigDotRadius,
                         positionTransformationClosure: { (position) -> CGPoint in
                             return strongSelf.normalizedPoint(
                                 fromVisionPoint: position, width: width, height: height)
                         }
                     )
                     strongSelf.annotationOverlayView.addSubview(poseOverlayView)
+                    if isPoseDetectionStart{
+                        getPoseData(pose: pose)
+                    }
                 }
             }
         }
@@ -324,25 +376,25 @@ extension ViewController{
         }
     }
     
-    private func updatePreviewOverlayViewWithLastFrame() {
-        guard let lastFrame = lastFrame,
-              let imageBuffer = CMSampleBufferGetImageBuffer(lastFrame)
-        else {
-            return
-        }
-        //self.updatePreviewOverlayViewWithImageBuffer(imageBuffer)
-        self.removeDetectionAnnotations()
-    }
+    //    private func updatePreviewOverlayViewWithLastFrame() {
+    //        guard let lastFrame = lastFrame,
+    //              let imageBuffer = CMSampleBufferGetImageBuffer(lastFrame)
+    //        else {
+    //            return
+    //        }
+    //        //self.updatePreviewOverlayViewWithImageBuffer(imageBuffer)
+    //        self.removeDetectionAnnotations()
+    //    }
     
-//    private func updatePreviewOverlayViewWithImageBuffer(_ imageBuffer: CVImageBuffer?) {
-//        guard let imageBuffer = imageBuffer else {
-//            return
-//        }
-//        let orientation: UIImage.Orientation = isUsingFrontCamera ? .leftMirrored : .right
-//        let image = UIUtilities.createUIImage(from: imageBuffer, orientation: orientation)
-//        previewOverlayView.image = image
-//    }
-//    
+    //    private func updatePreviewOverlayViewWithImageBuffer(_ imageBuffer: CVImageBuffer?) {
+    //        guard let imageBuffer = imageBuffer else {
+    //            return
+    //        }
+    //        let orientation: UIImage.Orientation = isUsingFrontCamera ? .leftMirrored : .right
+    //        let image = UIUtilities.createUIImage(from: imageBuffer, orientation: orientation)
+    //        previewOverlayView.image = image
+    //    }
+    //
     private func normalizedPoint(
         fromVisionPoint point: VisionPoint,
         width: CGFloat,
@@ -369,44 +421,122 @@ extension ViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
         }
         // Evaluate `self.currentDetector` once to ensure consistency throughout this method since it
         // can be concurrently modified from the main thread.
-//        let activeDetector = self.currentDetector
-//        resetManagedLifecycleDetectors(activeDetector: activeDetector)
+        //        let activeDetector = self.currentDetector
+        //        resetManagedLifecycleDetectors(activeDetector: activeDetector)
         
         if self.poseDetector == nil {
             self.poseDetector = PoseDetector.poseDetector(options: AccuratePoseDetectorOptions())
             //self.poseDetector = PoseDetector.poseDetector(options: PoseDetectorOptions())
         }
-        
         lastFrame = sampleBuffer
         let visionImage = VisionImage(buffer: sampleBuffer)
         let orientation = UIUtilities.imageOrientation(
             fromDevicePosition: isUsingFrontCamera ? .front : .back
         )
         visionImage.orientation = orientation
-        
         guard let inputImage = MLImage(sampleBuffer: sampleBuffer) else {
             print("Failed to create MLImage from sample buffer.")
             return
         }
         inputImage.orientation = orientation
-        
         let imageWidth = CGFloat(CVPixelBufferGetWidth(imageBuffer))
         let imageHeight = CGFloat(CVPixelBufferGetHeight(imageBuffer))
-        
-        
-        
         detectPose(in: inputImage, width: imageWidth, height: imageHeight)
-        
     }
-    
 }
 
+extension ViewController{
+    
+    private func getPoseData(pose: Pose) {
+        let keyPoints = mapBasedOnEnumSequence(frames: pose.landmarks)
+        var tempData = [[String: Any]]()
+        for index in 0..<keyPoints.count {
+            let data: [String: Any] = [
+                // "type": keyPoints[index].type.rawValue,
+                "zza": index,
+                "zzb": ["zza": keyPoints[index].position.x, "zzb":keyPoints[index].position.y, "zzc": keyPoints[index].position.z],
+                // "zzc": ["x": keyPoints[index].position.x, "y":keyPoints[index].position.y],
+                "zzd": trim(keyPoints[index].inFrameLikelihood)
+            ]
+            tempData.append(data)
+        }
+        // print("Temp Data: \(tempData)")
+        cameraPoses.append(tempData)
+    }
+    
+    private func trim(_ number: Float) -> Decimal {
+        let fourDecimalString = String(format: "%.4f", number)
+        let fourDecimalFloat = Decimal(string: fourDecimalString)
+        return fourDecimalFloat ?? 0
+    }
+    
+    private func mapBasedOnEnumSequence(frames: [PoseLandmark]) -> [PoseLandmark] {
+        
+        return frames.sorted { (item1, item2) -> Bool in
+            guard let poseType1 = PoseType(rawValue: item1.type.rawValue),
+                  let poseType2 = PoseType(rawValue: item2.type.rawValue),
+                  let index1 = poseTypeOrder.firstIndex(of: poseType1),
+                  let index2 = poseTypeOrder.firstIndex(of: poseType2) else {
+                return false
+            }
+            return index1 < index2
+        }
+    }
+    
+    private func sendPoses(){
+        let completedData: [String: Any] = ["complete_data": cameraPoses,
+                                            "final_stats": ["duration": 10,
+                                                            "reps":  0,
+                                                            "calories_burned":  0,
+                                                            "accuracy_score": 40,
+                                                            "is_final": true,"saved_video":""]]
+        
+        viewModel = SpeakingBotViewModel(postData: completedData, apiName: "lateral_raises")
+        viewModel?.sendFeedback()
+    }
+}
 
+enum PoseType: String {
+    case Nose
+    case LeftEyeInner
+    case LeftEye
+    case LeftEyeOuter
+    case RightEyeInner
+    case RightEye
+    case RightEyeOuter
+    case LeftEar
+    case RightEar
+    case MouthLeft
+    case MouthRight
+    case LeftShoulder
+    case RightShoulder
+    case LeftElbow
+    case RightElbow
+    case LeftWrist
+    case RightWrist
+    case LeftPinkyFinger
+    case RightPinkyFinger
+    case LeftIndexFinger
+    case RightIndexFinger
+    case LeftThumb
+    case RightThumb
+    case LeftHip
+    case RightHip
+    case LeftKnee
+    case RightKnee
+    case LeftAnkle
+    case RightAnkle
+    case LeftHeel
+    case RightHeel
+    case LeftToe
+    case RightToe
+}
 
 private enum Constant {
     static let videoDataOutputQueueLabel = "com.google.mlkit.visiondetector.VideoDataOutputQueue"
     static let sessionQueueLabel = "com.google.mlkit.visiondetector.SessionQueue"
-    static let smallDotRadius: CGFloat = 4.0
-    static let lineWidth: CGFloat = 3.0
+    static let smallDotRadius: CGFloat = 8.0
+    static let bigDotRadius: CGFloat = 15.0
+    static let lineWidth: CGFloat = 2.0
     static let originalScale: CGFloat = 1.0
 }
