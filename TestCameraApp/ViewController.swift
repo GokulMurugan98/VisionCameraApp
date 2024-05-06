@@ -169,13 +169,13 @@ extension ViewController{
     //This function is called when the shutter button is tapped
     @objc func recordPoses(){
         print("Shutter Button Tapped")
-//        if !isPoseDetectionStart{
-//            cameraPoses = []
-//            isPoseDetectionStart = true
-//        } else {
-//            //sendPoses()
-//            isPoseDetectionStart = false
-//        }
+        if !isPoseDetectionStart{
+            cameraPoses = []
+            isPoseDetectionStart = true
+        } else {
+            sendPoses()
+            isPoseDetectionStart = false
+        }
     }
 }
 
@@ -332,7 +332,7 @@ extension ViewController{
                 detectionError = error
             }
             weak var weakSelf = self
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async {
                 guard let strongSelf = weakSelf else {
                     print("Self is nil!")
                     return
@@ -361,8 +361,8 @@ extension ViewController{
                         }
                     )
                     strongSelf.annotationOverlayView.addSubview(poseOverlayView)
-                    if isPoseDetectionStart{
-                        getPoseData(pose: pose)
+                    if strongSelf.isPoseDetectionStart{
+                        strongSelf.getPoseData(pose: pose)
                     }
                 }
             }
