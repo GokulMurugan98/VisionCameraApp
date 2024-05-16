@@ -7,32 +7,6 @@
 import Foundation
 import AVFoundation
 
-struct EndPoint {
-    var path: String
-    var queryItems: [URLQueryItem] = []
-}
-
-extension EndPoint{
-    var url: URL {
-        var components = URLComponents()
-        components.scheme = "http"
-        components.host = "52.25.229.242"
-        components.port = 8000
-        components.path = "/" + path
-        if !queryItems.isEmpty {
-            components.queryItems = queryItems
-        }
-        
-        guard let url = components.url else {
-            preconditionFailure(
-                "Invalid URL components: \(components)"
-            )
-        }
-        
-        return url
-    }
-}
-
 class SpeakingBotViewModel{
     let postData:[String:Any]
     let apiName:String
@@ -73,9 +47,8 @@ class SpeakingBotViewModel{
                 let decodedData = try JSONDecoder().decode(Feedback.self, from: data)
                 for feedbackResult in decodedData.data.result {
                     if feedbackResult.messageType == "negative" {
-                        //self.speak(text: feedbackResult.voiceTitle)
+                        self.speak(text: feedbackResult.voiceTitle)
                     }
-                    
                     print("\(feedbackResult.messageType) : \(feedbackResult.voiceTitle)")
                 }
             } catch{
@@ -83,14 +56,12 @@ class SpeakingBotViewModel{
             }
         }
         task.resume()
-        
-        
     }
     
     private func speak(text: String) {
         speechUtterance = AVSpeechUtterance(string: text)
         DispatchQueue.global(qos: .background).sync{
-            synthesizer.speak(speechUtterance ?? AVSpeechUtterance(string: "Negative"))
+            synthesizer.speak(speechUtterance ?? AVSpeechUtterance(string: "negative"))
         }
         
     }

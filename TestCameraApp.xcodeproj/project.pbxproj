@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2924C8136D836C2DA912F536 /* Pods_TestCameraApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA741D83FCA2308D10F25AFE /* Pods_TestCameraApp.framework */; };
+		929E44D42BF491FC00F0C04B /* ExerciseCountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */; };
 		92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5A2BE4267900C9E230 /* AppDelegate.swift */; };
 		92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */; };
 		92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5E2BE4267900C9E230 /* ViewController.swift */; };
@@ -17,11 +18,15 @@
 		92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */; };
 		92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */; };
 		92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A732BE4BDFD00C9E230 /* Feedback.swift */; };
+		92F2E3E32BEB44AB0058BC3F /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */; };
+		92F2E3E62BEC9BF70058BC3F /* RepetitionCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */; };
+		92FA6E9C2BEA07D900623664 /* CountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FA6E9B2BEA07D900623664 /* CountdownViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		7F93A81E632A924424D31749 /* Pods-TestCameraApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestCameraApp.release.xcconfig"; path = "Target Support Files/Pods-TestCameraApp/Pods-TestCameraApp.release.xcconfig"; sourceTree = "<group>"; };
 		8D52CF00AAEF5B42E7CB765B /* Pods-TestCameraApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestCameraApp.debug.xcconfig"; path = "Target Support Files/Pods-TestCameraApp/Pods-TestCameraApp.debug.xcconfig"; sourceTree = "<group>"; };
+		929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCountdownViewController.swift; sourceTree = "<group>"; };
 		92A17A572BE4267900C9E230 /* TestCameraApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestCameraApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A17A5A2BE4267900C9E230 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -33,6 +38,9 @@
 		92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
 		92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakinBotViewModel.swift; sourceTree = "<group>"; };
 		92A17A732BE4BDFD00C9E230 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
+		92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepetitionCounter.swift; sourceTree = "<group>"; };
+		92FA6E9B2BEA07D900623664 /* CountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownViewController.swift; sourceTree = "<group>"; };
 		FA741D83FCA2308D10F25AFE /* Pods_TestCameraApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestCameraApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -85,6 +93,7 @@
 				92A17A682BE4267A00C9E230 /* Info.plist */,
 				92A17A702BE4BDB700C9E230 /* Vision Camera View */,
 				92A17A752BE4BE1B00C9E230 /* Networking */,
+				92F2E3E42BEB45270058BC3F /* UIElements */,
 			);
 			path = TestCameraApp;
 			sourceTree = "<group>";
@@ -105,6 +114,17 @@
 				92A17A732BE4BDFD00C9E230 /* Feedback.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		92F2E3E42BEB45270058BC3F /* UIElements */ = {
+			isa = PBXGroup;
+			children = (
+				92FA6E9B2BEA07D900623664 /* CountdownViewController.swift */,
+				92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */,
+				92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */,
+				929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */,
+			);
+			path = UIElements;
 			sourceTree = "<group>";
 		};
 		E149AA5C37262307B407FD3F /* Pods */ = {
@@ -249,10 +269,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				929E44D42BF491FC00F0C04B /* ExerciseCountdownViewController.swift in Sources */,
+				92FA6E9C2BEA07D900623664 /* CountdownViewController.swift in Sources */,
 				92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */,
+				92F2E3E32BEB44AB0058BC3F /* CircularProgressView.swift in Sources */,
 				92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */,
 				92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */,
 				92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */,
+				92F2E3E62BEC9BF70058BC3F /* RepetitionCounter.swift in Sources */,
 				92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */,
 				92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */,
 			);

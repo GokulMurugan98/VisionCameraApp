@@ -322,7 +322,7 @@ public class UIUtilities {
         }
         guard Thread.isMainThread else {
             var currentOrientation: UIDeviceOrientation = .portrait
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async {
                 currentOrientation = deviceOrientation()
             }
             return currentOrientation
