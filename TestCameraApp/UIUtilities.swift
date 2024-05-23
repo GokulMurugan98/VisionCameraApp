@@ -47,7 +47,9 @@ public class UIUtilities {
     public static func createPoseOverlayView(
         forPose pose: Pose, inViewWithBounds bounds: CGRect, lineWidth: CGFloat, smallDotRadius: CGFloat,
         bigDotRadius: CGFloat,
+        redLines:[String]?, greenLines:[String]?,
         positionTransformationClosure: (VisionPoint) -> CGPoint
+        
     ) -> UIView {
         let overlayView = UIView(frame: bounds)
         
@@ -67,10 +69,50 @@ public class UIUtilities {
         let nearZExtent: CGFloat = -lowerBodyHeight * adjustmentRatio
         let farZExtent: CGFloat = lowerBodyHeight * adjustmentRatio
         let zColorRange: CGFloat = farZExtent - nearZExtent
-        let nearZColor = UIColor.white
-        let farZColor = UIColor.white
+        var nearZColor = UIColor.white
+        var farZColor = UIColor.white
+//        var red_lines_part:[String] = []
+//        var green_lines_part:[String] = []
+//        var red_lines:[[String]] = [[]]
+//        var green_lines:[[String]] = [[]]
+        //Assigning the data from Speaking bot delegate feedback to the desired variables
+        
+        //Appending the values that the function returns when the function returns the array of values if we pass a string
+        //For eg: if feedback has "Right Upper Arm" the function return ["RightElbow", "RightShoulders"]
+        // We are looping for each value in the array of feedback strings.
+        // This is needed becaus for us to draw the required coloured line we need to check if the values are similar if not we can pring White color.
+        
+        
+//        if let red = redLines{
+//            red_lines_part = red
+//            for red in red_lines_part{
+//                red_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: red))
+//            }
+//        }
+//        
+//        
+//        
+//        if let green = greenLines{
+//            green_lines_part = green
+//            for green in green_lines_part{
+//                green_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: green))
+//            }
+//        }
+        
+        
+        
+        
+        
+        
         
         for (startLandmarkType, endLandmarkTypesArray) in UIUtilities.poseConnections() {
+            //Reassigning the color of the variables because if we didn't change it then it draws the previous color and won't prints white color.
+            if farZColor != UIColor.white{
+                farZColor = UIColor.white
+            }
+            if nearZColor != UIColor.white{
+                nearZColor = UIColor.white
+            }
             let startLandmark = pose.landmark(ofType: startLandmarkType)
             for endLandmarkType in endLandmarkTypesArray {
                 let endLandmark = pose.landmark(ofType: endLandmarkType)
@@ -79,6 +121,25 @@ public class UIUtilities {
                 
                 let landmarkZRatio = (startLandmark.position.z - nearZExtent) / zColorRange
                 let connectedLandmarkZRatio = (endLandmark.position.z - nearZExtent) / zColorRange
+                
+                //Looping through all the values in the red_lines variable and checking if this is the line we have to change the desired color accoring to feedback.
+                
+//                for x in red_lines{
+//                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
+//                        farZColor = UIColor.red
+//                        nearZColor = UIColor.red
+//                    }
+//                }
+//                
+//                
+//                
+//                for x in green_lines{
+//                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
+//                        farZColor = UIColor.green
+//                        nearZColor = UIColor.green
+//                    }
+//                }
+                
                 
                 let startColor = UIUtilities.interpolatedColor(
                     fromColor: nearZColor, toColor: farZColor, ratio: landmarkZRatio)
@@ -111,6 +172,66 @@ public class UIUtilities {
         return overlayView
     }
     
+    
+    //The function to convert the value from a string to MLKPoses type but as a String so that we can determine the color changes.
+    private func returnPointsBasedOnBodyPart(bodyPartName:String) -> [String]{
+        switch bodyPartName{
+            //HEAD:
+        case "Head":
+            return ["Nose", "LefyEyeInner"]
+            // LEFT BODY:
+        case "Left Upper Arm":
+            return ["LeftShoulder", "LeftElbow"]
+        case "Left Lower Arm":
+            return ["LeftElbow", "LeftWrist"]
+        case "Left Body":
+            return ["LeftShoulder", "LeftHip"]
+        case "Left Thigh":
+            return ["LeftHip", "LeftKnee"]
+        case "Left Lower Leg":
+            return ["LeftKnee", "LeftAnkle"]
+        case "Left Forearm":
+            return ["LeftWrist", "LeftThumb"]
+        case "Left Pinky":
+            return ["LeftWrist", "LeftPinky"]
+        case "Left Index":
+            return ["LeftWrist", "LeftIndex"]
+        case "Left Index Pinky":
+            return ["LeftIndex", "LeftPinky"]
+        case "Left Ankle":
+            return ["LeftAnkle", "LeftHeel"]
+        case "Left Heel":
+            return ["LeftHeel", "LeftFootIndex"]
+            // Right BODY:
+        case "Right Upper Arm":
+            return ["RightShoulder", "RightElbow"]
+        case "Right Lower Arm":
+            return ["RightElbow", "RightWrist"]
+        case "Right Body":
+            return ["RightShoulder", "RightHip"]
+        case "Right Thigh":
+            return ["RightHip", "RightKnee"]
+        case "Right Lower Leg":
+            return ["RightKnee", "RightAnkle"]
+        case "Right Forearm":
+            return ["RightWrist", "RightThumb"]
+        case "Right Pinky":
+            return ["RightWrist", "RightPinky"]
+        case "Right Index":
+            return ["RightWrist", "RightIndex"]
+        case "Right Index Pinky":
+            return ["RightIndex", "RightPinky"]
+        case "Right Ankle":
+            return ["RightAnkle", "RightHeel"]
+        case "Right Heel":
+            return ["RightHeel", "RightFootIndex"]
+        default:
+            return [""]
+        }
+    }
+    
+    
+    
     /// Returns the distance between two 3D points.
     ///
     /// - Parameters:
@@ -133,15 +254,15 @@ public class UIUtilities {
     private static func poseConnections() -> [PoseLandmarkType: [PoseLandmarkType]] {
         struct PoseConnectionsHolder {
             static var connections: [PoseLandmarkType: [PoseLandmarkType]] = [
-                PoseLandmarkType.leftEar: [PoseLandmarkType.leftEyeOuter],
-                PoseLandmarkType.leftEyeOuter: [PoseLandmarkType.leftEye],
-                PoseLandmarkType.leftEye: [PoseLandmarkType.leftEyeInner],
-                PoseLandmarkType.leftEyeInner: [PoseLandmarkType.nose],
-                PoseLandmarkType.nose: [PoseLandmarkType.rightEyeInner],
-                PoseLandmarkType.rightEyeInner: [PoseLandmarkType.rightEye],
-                PoseLandmarkType.rightEye: [PoseLandmarkType.rightEyeOuter],
-                PoseLandmarkType.rightEyeOuter: [PoseLandmarkType.rightEar],
-                PoseLandmarkType.mouthLeft: [PoseLandmarkType.mouthRight],
+                //                PoseLandmarkType.leftEar: [PoseLandmarkType.leftEyeOuter],
+                //                PoseLandmarkType.leftEyeOuter: [PoseLandmarkType.leftEye],
+                //                PoseLandmarkType.leftEye: [PoseLandmarkType.leftEyeInner],
+                //                PoseLandmarkType.leftEyeInner: [PoseLandmarkType.nose],
+                //                PoseLandmarkType.nose: [PoseLandmarkType.rightEyeInner],
+                //                PoseLandmarkType.rightEyeInner: [PoseLandmarkType.rightEye],
+                //                PoseLandmarkType.rightEye: [PoseLandmarkType.rightEyeOuter],
+                //                PoseLandmarkType.rightEyeOuter: [PoseLandmarkType.rightEar],
+                //                PoseLandmarkType.mouthLeft: [PoseLandmarkType.mouthRight],
                 PoseLandmarkType.leftShoulder: [
                     PoseLandmarkType.rightShoulder,
                     PoseLandmarkType.leftHip,

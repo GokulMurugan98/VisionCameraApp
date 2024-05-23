@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2924C8136D836C2DA912F536 /* Pods_TestCameraApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA741D83FCA2308D10F25AFE /* Pods_TestCameraApp.framework */; };
+		926D65132BFADC4900803355 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926D65122BFADC4900803355 /* Constants.swift */; };
+		926D65152BFB064500803355 /* GifView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926D65142BFB064500803355 /* GifView.swift */; };
+		9291FCD72BF738B7004D4110 /* VerticalProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9291FCD62BF738B7004D4110 /* VerticalProgressView.swift */; };
 		929E44D42BF491FC00F0C04B /* ExerciseCountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */; };
 		92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5A2BE4267900C9E230 /* AppDelegate.swift */; };
 		92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */; };
@@ -26,6 +29,9 @@
 /* Begin PBXFileReference section */
 		7F93A81E632A924424D31749 /* Pods-TestCameraApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestCameraApp.release.xcconfig"; path = "Target Support Files/Pods-TestCameraApp/Pods-TestCameraApp.release.xcconfig"; sourceTree = "<group>"; };
 		8D52CF00AAEF5B42E7CB765B /* Pods-TestCameraApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestCameraApp.debug.xcconfig"; path = "Target Support Files/Pods-TestCameraApp/Pods-TestCameraApp.debug.xcconfig"; sourceTree = "<group>"; };
+		926D65122BFADC4900803355 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
+		926D65142BFB064500803355 /* GifView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GifView.swift; sourceTree = "<group>"; };
+		9291FCD62BF738B7004D4110 /* VerticalProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerticalProgressView.swift; sourceTree = "<group>"; };
 		929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCountdownViewController.swift; sourceTree = "<group>"; };
 		92A17A572BE4267900C9E230 /* TestCameraApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestCameraApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A17A5A2BE4267900C9E230 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -123,6 +129,9 @@
 				92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */,
 				92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */,
 				929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */,
+				9291FCD62BF738B7004D4110 /* VerticalProgressView.swift */,
+				926D65122BFADC4900803355 /* Constants.swift */,
+				926D65142BFB064500803355 /* GifView.swift */,
 			);
 			path = UIElements;
 			sourceTree = "<group>";
@@ -273,12 +282,15 @@
 				92FA6E9C2BEA07D900623664 /* CountdownViewController.swift in Sources */,
 				92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */,
 				92F2E3E32BEB44AB0058BC3F /* CircularProgressView.swift in Sources */,
+				9291FCD72BF738B7004D4110 /* VerticalProgressView.swift in Sources */,
 				92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */,
 				92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */,
+				926D65152BFB064500803355 /* GifView.swift in Sources */,
 				92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */,
 				92F2E3E62BEC9BF70058BC3F /* RepetitionCounter.swift in Sources */,
 				92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */,
 				92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */,
+				926D65132BFADC4900803355 /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

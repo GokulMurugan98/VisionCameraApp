@@ -41,7 +41,7 @@ class ViewController: UIViewController {
     
     
     //MARK: The Variable which defined if it is a Rep based or timer based exercise
-    let typeOfExercise:String = "timer"
+    let typeOfExercise:String = "reps"
     
     //MARK: Vision Variables
     //    //Setting up the ImageView to display video
@@ -119,14 +119,33 @@ class ViewController: UIViewController {
     //MARK: Sending poses to calculate Reps
     var repCounter:RepetitionCounter?
     var poseDelegate:PoseDataDelegate?
-    var reps:String = "0"
-    let wrapperView = UIView()
-    var stack = UIStackView()
+    var repsFromDelegate:String = "0"
+    var accuracyFromDelegate:Double = 0.0
+    var wrapperView = UIView()
+    var repSpeed:VerticalProgressView?
     
     //MARK: Timer View controller for Exercise
     var exerciseTimeCounter:ExerciseCountdownViewController?
     var exerciseTime:Int = 30
     var accuracyStack = UIStackView()
+    
+    
+    //MARK: To Change color of the lines based on result from speaking bot
+    var redColorLines:[String] = []
+    var greenColorLines:[String] = []
+    var changeInColor:Bool = false
+    
+    //MARK: The welcome Tag's varible
+    var importantIcon = makeImageView(withImageName: UIConstants.importantIcon, width: 83, height: 30)
+    var instructionLabel = "put your phone in vertical direction"
+    var instructionStack = UIStackView()
+    
+    //MARK: When the user taps Record a GIF should be played
+    var gifURL:String = "http://www.gifbin.com/bin/4802swswsw04.gif"
+    var gifDisplayView:GifView?
+    
+    //MARK: Video rotation based on Portrait or Landscape
+    var isPortrait:Bool = true
 }
 
 
@@ -136,24 +155,46 @@ extension ViewController{
     //Adding Sub Views to the Main View
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        //        view.layer.addSublayer(previewLayer)
-        //        view.addSubview(shutterButtuon)
+        //MARK: Entry Point
+//        if isPortrati{
+//            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+//        } else {
+//            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+//        }
+        
         checkPermission()
         shutterButtuon.addTarget(self, action: #selector(recordPoses), for: .touchUpInside)
         timerRepSelection.addTarget(self, action: #selector(selectRepsOrTime), for: .touchUpInside)
-        
-       
-        
+        createInformationStack()
+        // Register for device orientation changes
+        NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
     }
     //Setting Up layers for the camera
     override func viewDidLayoutSubviews() {
         previewLayer.frame = view.bounds
         shutterButtuon.center = CGPoint(x: view.frame.size.width/2,
-                                        y: view.frame.size.height - 100)
+                                        y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
         timerRepSelection.center = CGPoint(x: view.safeAreaInsets.left+50,
-                                        y: view.frame.size.height - 100)
+                                        y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
+        
     }
+    
+    
+    // MARK: - Orientation Handling
+    @objc func orientationChanged() {
+        guard let connection = previewLayer?.connection else {
+            print("not working")
+            return
+        }
+        if connection.isVideoOrientationSupported {
+            if isPortrait {
+                connection.videoOrientation = .portrait
+            } else {
+                connection.videoOrientation = .landscapeRight
+            }
+        }
+    }
+    
     //Checking Permission once the app lauches
     private func checkPermission(){
         switch AVCaptureDevice.authorizationStatus(for: .video){
@@ -177,6 +218,12 @@ extension ViewController{
             break
         }
     }
+    
+   
+
+
+    
+    
     
     //    //If the permission is granted then setting up camera and displaying the video.
     //    private func setupCamera(){
@@ -207,12 +254,22 @@ extension ViewController{
         print("Shutter Button Tapped")
         shutterButtuon.removeFromSuperview()
         timerRepSelection.removeFromSuperview()
+        importantIcon.removeFromSuperview()
+        instructionStack.removeFromSuperview()
+        //MARK: GIF Should Be presented here
+        playGif()
+        
+        
         countdown = CountdownViewController()
+        countdown?.isWrapped = true
         if let countdown = countdown{
             countdown.modalPresentationStyle = .overFullScreen
             countdown.countdownDelegate = self
             present(countdown, animated: false)
         }
+        
+        
+        
         if typeOfExercise == "reps"{
             repCounter = RepetitionCounter(muscleGroup: [
                 "SHOULDER",
@@ -229,6 +286,58 @@ extension ViewController{
         
     }
 }
+//MARK: Functions needed for initial UI Setup
+extension ViewController{
+    
+    private func createInformationStack() {
+        let mainStack = makeStackView(withOrientation: .horizontal)
+        let imageIcon = makeImageView(withImageName: UIConstants.portraitIcon, width: 45, height: 45)
+        let label = returnUIlabel(title: instructionLabel, fontSize: 16,color: .white)
+        
+        mainStack.addArrangedSubview(imageIcon)
+        mainStack.addArrangedSubview(label)
+        
+        instructionStack.backgroundColor = .black.withAlphaComponent(0.6)
+        instructionStack.layer.cornerRadius = 10
+        // Make sure 'instructionStack' is defined and initialized correctly
+        instructionStack.translatesAutoresizingMaskIntoConstraints = false
+        importantIcon.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(importantIcon)
+        // Ensure 'self.view' is accessible and contains necessary elements, and 'importantIcon' is defined
+        self.view.addSubview(instructionStack)
+        // Make sure 'importantIcon' is defined
+        instructionStack.addSubview(mainStack)
+        
+       
+        NSLayoutConstraint.activate([
+            importantIcon.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            importantIcon.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10)
+        ])
+        
+        
+        NSLayoutConstraint.activate([
+            mainStack.leadingAnchor.constraint(equalTo: instructionStack.leadingAnchor, constant: 10),
+            mainStack.trailingAnchor.constraint(equalTo: instructionStack.trailingAnchor, constant: -10),
+            mainStack.topAnchor.constraint(equalTo: instructionStack.topAnchor, constant: 10),
+            mainStack.bottomAnchor.constraint(equalTo: instructionStack.bottomAnchor, constant: -10),
+            
+            instructionStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor,constant: 10),
+            instructionStack.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -10),
+            // Ensure 'importantIcon' is accessible and properly defined
+            instructionStack.topAnchor.constraint(equalTo: importantIcon.bottomAnchor,constant: 20),
+        ])
+    }
+    
+    private func playGif(){
+        self.gifDisplayView = GifView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: view.bounds.height), gifUrlString: gifURL)
+        if let gif = gifDisplayView{
+            self.view.addSubview(gif)
+        }
+        
+    }
+}
+
+
 
 //MARK: Functions needed for Vision Camera
 extension ViewController{
@@ -252,7 +361,6 @@ extension ViewController{
                 print("Self is nil!")
                 return
             }
-            
             strongSelf.captureSession.startRunning()
         }
     }
@@ -364,6 +472,7 @@ extension ViewController{
                 strongSelf.captureSession.commitConfiguration()
                 DispatchQueue.main.sync {
                     strongSelf.startSession()
+                    strongSelf.orientationChanged()
                     strongSelf.view.addSubview(strongSelf.shutterButtuon)
                     strongSelf.view.addSubview(strongSelf.timerRepSelection)
                     
@@ -408,6 +517,8 @@ extension ViewController{
                         lineWidth: Constant.lineWidth,
                         smallDotRadius: Constant.smallDotRadius,
                         bigDotRadius: Constant.bigDotRadius,
+                        redLines: strongSelf.redColorLines,
+                        greenLines: strongSelf.greenColorLines,
                         positionTransformationClosure: { (position) -> CGPoint in
                             return strongSelf.normalizedPoint(
                                 fromVisionPoint: position, width: width, height: height)
@@ -416,7 +527,6 @@ extension ViewController{
                     strongSelf.annotationOverlayView.addSubview(poseOverlayView)
                     if strongSelf.isPoseDetectionStart{
                         strongSelf.getPoseData(pose: pose)
-                        print("sending pose data")
                         strongSelf.poseDelegate?.getPoses(pose: pose)
                     }
                 }
@@ -465,6 +575,14 @@ extension ViewController{
 
 extension ViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
     
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask{
+        if isPortrait{
+            return .portrait
+        } else {
+            return .landscape
+        }
+    }
+    
     func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
@@ -478,6 +596,7 @@ extension ViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
         // can be concurrently modified from the main thread.
         //        let activeDetector = self.currentDetector
         //        resetManagedLifecycleDetectors(activeDetector: activeDetector)
+        
         
         if self.poseDetector == nil {
             self.poseDetector = PoseDetector.poseDetector(options: AccuratePoseDetectorOptions())
@@ -546,7 +665,9 @@ extension ViewController{
                                                             "accuracy_score": 40,
                                                             "is_final": true,"saved_video":""]]
         cameraPoses = []
+  //      print(completedData)
         viewModel = SpeakingBotViewModel(postData: completedData, apiName: "lateral_raises")
+        viewModel?.delegate = self
         viewModel?.sendFeedback()
     }
 }
@@ -599,12 +720,23 @@ private enum Constant {
 //MARK: Countdown Delegate
 extension ViewController:CountdownDelegate{
     func didFinishCountdown() {
+        gifDisplayView?.removeFromSuperview()
         isPoseDetectionStart = true
         if typeOfExercise == "reps"{
-            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
-            timer?.fire()
+//            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+//            timer?.fire()
+            exerciseTimeCounter = ExerciseCountdownViewController()
+            repSpeed = VerticalProgressView()
+            setupRepCounterUI()
+            if let ex = exerciseTimeCounter{
+                ex.modalPresentationStyle = .overFullScreen
+                ex.countdownDelegate = self
+                present(ex, animated: false)
+                ex.startTimer(with: 90)
+            }
         } else {
             exerciseTimeCounter = ExerciseCountdownViewController()
+            setupTimeCounterUI()
             if let ex = exerciseTimeCounter{
                 ex.modalPresentationStyle = .overFullScreen
                 ex.countdownDelegate = self
@@ -613,12 +745,6 @@ extension ViewController:CountdownDelegate{
             }
         }
         addWrapperView()
-        if typeOfExercise == "reps"{
-            setupRepCounterUI()
-        } else {
-            setupTimeCounterUI()
-        }
-        
     }
     
     @objc func timerFired(){
@@ -644,16 +770,23 @@ protocol PoseDataDelegate{
 //MARK: Repcounter UI
 extension ViewController:RepetitionCountUIUpdateDelegate{
     func getRepCount(rep: String) {
-        if rep != reps{
-            reps = rep
-            removeStack()
-            setupRepCounterUI()
+        if rep != repsFromDelegate{
+            repsFromDelegate = rep
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {return}
+                self.removeStack()
+                self.wrapperView = UIView()
+                self.setupRepCounterUI(with: self.repsFromDelegate, accuracy: accuracyFromDelegate)
+                self.addWrapperView()
+            }
         }
     }
     
     func didCompletePoses() {
         timer?.invalidate()
         timer = nil
+        exerciseTimeCounter?.stopTimer()
+        exerciseTimeCounter?.countdownView.stopTimer()
         isPoseDetectionStart = false
         //MARK: Send one last time all the pose data
         sendPoses()
@@ -666,31 +799,43 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
     }
     
     func removeStack(){
-        stack.removeFromSuperview()
+        wrapperView.removeFromSuperview()
     }
     
-    func setupRepCounterUI(){
+    func setupRepCounterUI(with reps: String = "0", accuracy: Double = 0.0, calories: Int = 0) {
+        guard let repSpeed = repSpeed else { return }
         
-        // Create a wrapper view for the stack view
-         // Set the background color of the wrapper view
+        // Add repSpeed to the main view and set its constraints
+        view.addSubview(repSpeed)
+        repSpeed.translatesAutoresizingMaskIntoConstraints = false
         
-        // Add the stack view to the wrapper view
-        stack = makeStackView(withOrientation: .vertical, distribution: .fill, spacing: 5)
+        // Create the main stack view
+        let stack = makeStackView(withOrientation: .vertical, distribution: .equalSpacing)
         stack.backgroundColor = .clear
+        stack.translatesAutoresizingMaskIntoConstraints = false
         
+        // Create the exercise data views
+        let repCounter = exerciseDataView(for: .Reps, mainValueToDisplay: "\(reps)", addedValue: "/ 15")
+        accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: String(format: "%.0f", accuracy), addedValue: "%")
+        let caloriesView = exerciseDataView(for: .Calories, mainValueToDisplay: "\(calories)", addedValue: "cal")
         
-        let repCounter = exerciseDataView(for: .Reps, mainValueToDisplay: reps, addedValue: "/ 15")
-        let accuracy = exerciseDataView(for: .Accuracy, mainValueToDisplay: "20", addedValue: "%")
-        let calories = exerciseDataView(for: .Calories, mainValueToDisplay: "88", addedValue: "cal")
+        // Add the exercise data views to the stack view
         stack.addArrangedSubview(repCounter)
-        stack.addArrangedSubview(accuracy)
-        stack.addArrangedSubview(calories)
+        stack.addArrangedSubview(accuracyStack)
+        stack.addArrangedSubview(caloriesView)
+        
+        // Set spacing between the views
+        stack.setCustomSpacing(5, after: repCounter)
+        stack.setCustomSpacing(5, after: accuracyStack)
         
         wrapperView.addSubview(stack)
+        wrapperView.translatesAutoresizingMaskIntoConstraints = false
+        wrapperView.backgroundColor = .clear
         
         // Add the wrapper view to the main view
-        self.view.addSubview(wrapperView)
+        view.addSubview(wrapperView)
         
+        // Activate constraints
         NSLayoutConstraint.activate([
             // Constrain the stack view to the wrapper view with padding
             stack.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: 10),
@@ -703,44 +848,56 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
             wrapperView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
         ])
         
-        
+        // Set constraints for repSpeed based on orientation
+        if isPortrait {
+            NSLayoutConstraint.activate([
+                repSpeed.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+                repSpeed.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10),
+                repSpeed.widthAnchor.constraint(equalToConstant: 105),
+                repSpeed.heightAnchor.constraint(equalToConstant: 200)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                repSpeed.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+                repSpeed.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -10),
+                repSpeed.widthAnchor.constraint(equalToConstant: 105),
+                repSpeed.heightAnchor.constraint(equalToConstant: 200)
+            ])
+        }
     }
-    
-    func exerciseDataView(for Activity:ActivityType, mainValueToDisplay:String?, addedValue:String?) -> UIStackView{
-        
+
+
+    func exerciseDataView(for activity: ActivityType, mainValueToDisplay: String?, addedValue: String?) -> UIStackView {
         let stack = makeStackView(withOrientation: .vertical)
         let horizontalStack1 = makeStackView(withOrientation: .horizontal, spacing: 2)
-        let horizontalStack2 = makeStackView(withOrientation: .horizontal, spacing: 2)
         stack.heightAnchor.constraint(equalToConstant: 90).isActive = true
         stack.widthAnchor.constraint(equalToConstant: 100).isActive = true
         stack.translatesAutoresizingMaskIntoConstraints = false
-        switch Activity{
-            
+        
+        switch activity {
         case .Accuracy:
-            addAllViewsTogether(mainStach: stack, horizontalStack1: horizontalStack1, horizontalStack2: horizontalStack2, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "scope", iconTitle: "Accuracy", colorforText: .white)
-            if Int(mainValueToDisplay!)! > 0 && Int(mainValueToDisplay!)! <= 40{
+            addAllViewsTogether(mainStack: stack, horizontalStack1: horizontalStack1, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "scope", iconTitle: "Accuracy", colorforText: .white)
+            if let mainValue = mainValueToDisplay, let intValue = Int(mainValue), intValue > 0 && intValue <= 40 {
                 stack.backgroundColor = UIColor(red: 166/255, green: 69/255, blue: 69/255, alpha: 1)
-            } else if Int(mainValueToDisplay!)! > 40 && Int(mainValueToDisplay!)! < 75{
+            } else if let mainValue = mainValueToDisplay, let intValue = Int(mainValue), intValue > 40 && intValue < 75 {
                 stack.backgroundColor = UIColor(red: 201/255, green: 147/255, blue: 65/255, alpha: 1)
             } else {
                 stack.backgroundColor = UIColor(red: 91/255, green: 142/255, blue: 120/255, alpha: 1)
             }
             
         case .Calories:
-            addAllViewsTogether(mainStach: stack, horizontalStack1: horizontalStack1, horizontalStack2: horizontalStack2, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "flame", iconTitle: "Calories Burn", colorforText: .darkGray)
+            addAllViewsTogether(mainStack: stack, horizontalStack1: horizontalStack1, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "flame", iconTitle: "Calories Burn", colorforText: .darkGray)
             stack.backgroundColor = .white
             
         case .Reps:
-            addAllViewsTogether(mainStach: stack, horizontalStack1: horizontalStack1, horizontalStack2: horizontalStack2, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "arrow.circlepath", iconTitle: "Rep Count", colorforText: .white, subFontSize: 18)
+            addAllViewsTogether(mainStack: stack, horizontalStack1: horizontalStack1, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "arrow.circlepath", iconTitle: "Rep Count", colorforText: .white, subFontSize: 18)
             stack.backgroundColor = .none
-            
-        case .Timer:
-            addAllViewsTogether(mainStach: stack, horizontalStack1: horizontalStack1, horizontalStack2: horizontalStack2, mainValue: mainValueToDisplay, subValue: addedValue, iconName: "clock.arrow.circlepath", iconTitle: "Timer", colorforText: .white, subFontSize: 18)
-            stack.backgroundColor = .none
-            
         }
+        
         return stack
     }
+
+
 }
 
 //MARK: Time Counter UI and Delegate
@@ -776,3 +933,28 @@ extension ViewController:ExerciseCountdownDelegate{
     }
 }
 
+//MARK: Spraking Bot Delegate
+
+extension ViewController:SpeakingBotDelegate{
+    func updateRepSpeed() {
+        if let repSpeed = repSpeed{
+            repSpeed.updateProgress(0.5, seconds: "1.5")
+        }
+    }
+    
+    func updateColorsForBodyPart(bodyParts: BodyPartsColor) {
+            self.redColorLines = bodyParts.red
+            self.greenColorLines = bodyParts.green
+    }
+    
+    func updateAccuracy(with accuracy: Double?) {
+        if accuracy != nil && accuracyFromDelegate != accuracy{
+            accuracyFromDelegate = accuracy!
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else {return}
+                self.removeStack()
+                self.setupRepCounterUI(with: repsFromDelegate, accuracy: accuracyFromDelegate)
+            }
+        }
+    }
+}

@@ -16,74 +16,71 @@ class ExerciseCountdownViewController: UIViewController {
     
     var timer: Timer?
     let countdownLabel = UILabel()
-    let countdownView = CircularProgressView(isTrue: true,width: 75, height: 75,lineWidth: 5)
-    var time:Int = 0
+    let countdownView = CircularProgressView(isTrue: true, width: 75, height: 75, lineWidth: 5)
+    var time: Int = 0
     var countdownDelegate: ExerciseCountdownDelegate?
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         self.view.backgroundColor = UIColor.black.withAlphaComponent(0.01)
+        
         // add countdownView as subview
         let wrapperView = makeStackView(withOrientation: .vertical)
         let mainStack = makeStackView(withOrientation: .vertical)
-        let imageView = makeImageView(withImageName: "timer", width: 20, height: 20)
-        let label = returnUIlabel(title: "Timer", fontSize: 16)
+        let imageView = makeImageView(withImageName: "timer", width: 20, height: 20, textColor: .white)
+        let label = returnUIlabel(title: "Timer", fontSize: 14, color: .white, weight: .medium)
         let horizontalStack = makeStackView(withOrientation: .horizontal)
         horizontalStack.addArrangedSubview(imageView)
         horizontalStack.addArrangedSubview(label)
-        
         
         mainStack.addArrangedSubview(horizontalStack)
         mainStack.addArrangedSubview(countdownView)
         
         horizontalStack.translatesAutoresizingMaskIntoConstraints = false
-        horizontalStack.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor).isActive = true
-        horizontalStack.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor).isActive = true
-        horizontalStack.topAnchor.constraint(equalTo: mainStack.topAnchor).isActive = true
-        horizontalStack.bottomAnchor.constraint(equalTo: countdownView.topAnchor).isActive = true
-        
+        horizontalStack.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 10).isActive = true
+        horizontalStack.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -10).isActive = true
+        horizontalStack.topAnchor.constraint(equalTo: mainStack.topAnchor, constant: 10).isActive = true
+        horizontalStack.bottomAnchor.constraint(equalTo: countdownView.topAnchor, constant: -10).isActive = true
         
         mainStack.layer.cornerRadius = 10
         mainStack.backgroundColor = .black.withAlphaComponent(0.5)
         wrapperView.addSubview(mainStack)
         view.addSubview(wrapperView)
         
+        wrapperView.translatesAutoresizingMaskIntoConstraints = false
+        wrapperView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: 0).isActive = true
+        wrapperView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         
         mainStack.translatesAutoresizingMaskIntoConstraints = false
-        mainStack.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor,constant: 10).isActive = true
-        mainStack.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor,constant: 10).isActive = true
-        mainStack.topAnchor.constraint(equalTo: wrapperView.topAnchor,constant: 10).isActive = true
-        mainStack.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor,constant: 10).isActive = true
+        mainStack.leadingAnchor.constraint(equalTo: wrapperView.leadingAnchor, constant: 10).isActive = true
+        mainStack.trailingAnchor.constraint(equalTo: wrapperView.trailingAnchor, constant: -10).isActive = true
+        mainStack.topAnchor.constraint(equalTo: wrapperView.topAnchor, constant: 10).isActive = true
+        mainStack.bottomAnchor.constraint(equalTo: wrapperView.bottomAnchor, constant: -10).isActive = true
         
         // set up countdownView's appearance
-        //countdownView.backgroundColor = .black.withAlphaComponent(0.5)
         countdownView.addSubview(countdownLabel)
-        
         
         countdownLabel.translatesAutoresizingMaskIntoConstraints = false
         countdownLabel.centerXAnchor.constraint(equalTo: countdownView.centerXAnchor).isActive = true
         countdownLabel.centerYAnchor.constraint(equalTo: countdownView.centerYAnchor).isActive = true
-        
         
         countdownLabel.textColor = UIColor.white
         countdownLabel.font = UIFont.boldSystemFont(ofSize: 18)
         
         // set up constraints for countdownView
         countdownView.translatesAutoresizingMaskIntoConstraints = false
-        countdownView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor,constant: -20).isActive = true
-        countdownView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 20).isActive = true
+        countdownView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -20).isActive = true
+        countdownView.topAnchor.constraint(equalTo: horizontalStack.bottomAnchor, constant: 10).isActive = true
         countdownView.widthAnchor.constraint(equalToConstant: 75).isActive = true
         countdownView.heightAnchor.constraint(equalToConstant: 75).isActive = true
         countdownView.layer.cornerRadius = 15
         countdownView.layer.shadowRadius = 5
-
         
+        // Log to check if horizontal stack is set up correctly
+        print("Horizontal stack subviews: \(horizontalStack.arrangedSubviews)")
     }
     
-    
-    func startTimer(with time:Int){
+    func startTimer(with time: Int) {
         countdownView.startTimer(with: time)
         countdownLabel.text = "\(time)"
         // start timer
@@ -92,13 +89,16 @@ class ExerciseCountdownViewController: UIViewController {
             if self.countdownView.remainingTime == 1 {
                 self.timer?.invalidate()
                 self.countdownDelegate?.didFinishExerciseTimerCountdown()
-                
             } else {
                 let currentTime = countdownView.remainingTime - 1
                 self.countdownLabel.text = "\(currentTime)"
                 self.countdownDelegate?.currentCountDown(seconds: currentTime)
             }
         }
-        
+    }
+    
+    func stopTimer() {
+        timer?.invalidate()
+        timer = nil
     }
 }

@@ -26,7 +26,7 @@ class CircularProgressView: UIView {
         return max(0, totalTime - currentTime)
     }
     
-    init(isTrue:Bool = false, withBackgorundColor:CGColor = UIColorFromHex(hex: "E9E9FF").cgColor, withProgressColor:CGColor = UIColorFromHex(hex: "121ACE").cgColor, width:CGFloat = 100, height:CGFloat = 100, textColor:UIColor = .black, textSize:CGFloat = 16,lineWidth:CGFloat = 8) {
+    init(isTrue:Bool = false, withBackgorundColor:CGColor = UIColorFromHex(hex: "8C8C8C").cgColor, withProgressColor:CGColor = UIColorFromHex(hex: "FFFFFF").cgColor, width:CGFloat = 100, height:CGFloat = 100, textColor:UIColor = .black, textSize:CGFloat = 16,lineWidth:CGFloat = 8) {
         super.init(frame: .zero)
         translatesAutoresizingMaskIntoConstraints = false // Set this to false for Auto Layout compatibility
         startedRecordingProgress = isTrue
@@ -114,10 +114,10 @@ class CircularProgressView: UIView {
         /// so that user can get voice feedback over a certain time frame (setting to 10 seconds)
         if currentTime != 0 && currentTime < totalTime{
             //self.delegate?.currentCountdown(currentTime)
-            print("Countdown Check")
+            //print("Countdown Check")
         }
         if currentTime >= totalTime {
-            print("Timer Check")
+            //print("Timer Check")
             stopTimer()
             /// this is checking if given time frame is finished
             /// if finished it will let know camera viewcontroller

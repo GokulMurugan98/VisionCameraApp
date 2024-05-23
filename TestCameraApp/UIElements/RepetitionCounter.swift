@@ -215,7 +215,7 @@ extension RepetitionCounter{
 }
 
 enum ActivityType{
-    case Accuracy, Calories, Reps, Timer
+    case Accuracy, Calories, Reps
 }
 
 
@@ -236,13 +236,16 @@ public func makeStackView(withOrientation axis: NSLayoutConstraint.Axis,
 
 public func makeImageView(withImageName name: String,
                           width: CGFloat,
-                          height: CGFloat, contentMode: UIView.ContentMode = .scaleAspectFit) -> UIImageView {
+                          height: CGFloat, contentMode: UIView.ContentMode = .scaleAspectFit, textColor:UIColor? = nil) -> UIImageView {
     let imageView = UIImageView()
     imageView.translatesAutoresizingMaskIntoConstraints = false
     if UIImage(systemName: name) == nil {
         imageView.image = UIImage(named: name)
     } else {
         imageView.image = UIImage(systemName: name)
+    }
+    if let color = textColor{
+        imageView.tintColor = color
     }
     imageView.heightAnchor.constraint(equalToConstant: height).isActive = true
     imageView.widthAnchor.constraint(equalToConstant: width).isActive = true
@@ -251,51 +254,77 @@ public func makeImageView(withImageName name: String,
     return imageView
 }
 
-public func returnUIlabel(title:String, fontSize:CGFloat, color:UIColor = .darkGray ) -> UIView{
+public func returnUIlabel(title:String, fontSize:CGFloat, color:UIColor = .darkGray, weight:UIFont.Weight = .semibold, textAlignment:NSTextAlignment = .center) -> UIView{
     let valueLabel = UILabel()
     valueLabel.translatesAutoresizingMaskIntoConstraints = false
     valueLabel.text = title
-    valueLabel.font = UIFont.systemFont(ofSize: fontSize, weight: .semibold)
+    valueLabel.font = UIFont.systemFont(ofSize: fontSize, weight: weight)
     valueLabel.textColor = color
-    valueLabel.textAlignment = .center
+    valueLabel.textAlignment = textAlignment
     return valueLabel
 }
 
-public func addAllViewsTogether(mainStach:UIStackView, horizontalStack1:UIStackView, horizontalStack2:UIStackView, mainValue:String?, subValue:String?, iconName:String, iconTitle:String, colorforText:UIColor, subFontSize: CGFloat = 10){
-    let icon = makeImageView(withImageName: iconName, width: 15, height: 15,contentMode: .scaleAspectFit)
+public func addAllViewsTogether(
+    mainStack: UIStackView,
+    horizontalStack1: UIStackView,
+    mainValue: String?,
+    subValue: String?,
+    iconName: String,
+    iconTitle: String,
+    colorforText: UIColor,
+    subFontSize: CGFloat = 10
+) {
+    // Initialize the image view for the icon
+    let icon = makeImageView(withImageName: iconName, width: 15, height: 15, contentMode: .scaleAspectFit)
     icon.tintColor = colorforText
-    let view1 = returnUIlabel(title: iconTitle,fontSize: 10, color: colorforText)
+    icon.translatesAutoresizingMaskIntoConstraints = false
     
+    // Initialize the label for the icon title
+    let view1 = returnUIlabel(title: iconTitle, fontSize: 10, color: colorforText)
+    view1.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Add the icon and title label to the first horizontal stack
     horizontalStack1.addArrangedSubview(icon)
     horizontalStack1.addArrangedSubview(view1)
+    horizontalStack1.translatesAutoresizingMaskIntoConstraints = false
     horizontalStack1.backgroundColor = .none
-    let horizontalStack2 = makeStackView(withOrientation: .horizontal,alignment: .fill, spacing: 2)
     
-    if let mainValue = mainValue, let subFont = subValue{
-        let view2 = returnUIlabel(title: mainValue,fontSize: 36, color: colorforText)
+    // Initialize the second horizontal stack
+    let horizontalStack2 = makeStackView(withOrientation: .horizontal, alignment: .fill)
+    horizontalStack2.translatesAutoresizingMaskIntoConstraints = false
+    
+    // Add mainValue and subValue labels to the second horizontal stack if they are provided
+    if let mainValue = mainValue, let subValue = subValue {
+        let view2 = returnUIlabel(title: mainValue, fontSize: 36, color: colorforText)
+        view2.translatesAutoresizingMaskIntoConstraints = false
         horizontalStack2.addArrangedSubview(view2)
-        let view3 = returnUIlabel(title: subFont,fontSize: subFontSize, color: colorforText)
+        
+        let view3 = returnUIlabel(title: subValue, fontSize: subFontSize, color: colorforText)
+        view3.translatesAutoresizingMaskIntoConstraints = false
         horizontalStack2.addArrangedSubview(view3)
-    } else{
+    } else {
         horizontalStack2.heightAnchor.constraint(equalToConstant: 100).isActive = true
     }
+    
     horizontalStack2.backgroundColor = .none
-    mainStach.layer.cornerRadius = 10
-    mainStach.addArrangedSubview(horizontalStack1)
-    mainStach.addArrangedSubview(horizontalStack2)
     
+    // Configure the main stack view
+    mainStack.layer.cornerRadius = 10
+    mainStack.translatesAutoresizingMaskIntoConstraints = false
+    mainStack.addArrangedSubview(horizontalStack1)
+    mainStack.addArrangedSubview(horizontalStack2)
+    
+    // Add constraints
     NSLayoutConstraint.activate([
+        // Constraints for the first horizontal stack
         view1.trailingAnchor.constraint(equalTo: horizontalStack1.trailingAnchor, constant: -10),
-        icon.trailingAnchor.constraint(equalTo: view1.leadingAnchor, constant: 5)
+        icon.trailingAnchor.constraint(equalTo: view1.leadingAnchor, constant: -5),
+        
+        // Constraints for the main stack
+        horizontalStack1.topAnchor.constraint(equalTo: mainStack.topAnchor, constant: 5),
+        horizontalStack2.leadingAnchor.constraint(equalTo: mainStack.leadingAnchor, constant: 5),
+        horizontalStack2.trailingAnchor.constraint(equalTo: mainStack.trailingAnchor, constant: -15),
+        horizontalStack2.bottomAnchor.constraint(equalTo: mainStack.bottomAnchor, constant: -5)
     ])
-    
-    
-    NSLayoutConstraint.activate([
-        horizontalStack1.topAnchor.constraint(equalTo: mainStach.topAnchor, constant: 5),
-        horizontalStack2.leadingAnchor.constraint(equalTo: mainStach.leadingAnchor, constant: 5),
-        horizontalStack2.trailingAnchor.constraint(equalTo: mainStach.trailingAnchor, constant: -15),
-    ])
-    
-    
 }
 

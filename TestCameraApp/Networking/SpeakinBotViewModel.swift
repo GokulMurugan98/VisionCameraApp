@@ -7,11 +7,19 @@
 import Foundation
 import AVFoundation
 
+
+protocol SpeakingBotDelegate{
+    func updateAccuracy(with accuracy:Double?)
+    func updateColorsForBodyPart(bodyParts:BodyPartsColor)
+    func updateRepSpeed()
+}
+
 class SpeakingBotViewModel{
     let postData:[String:Any]
     let apiName:String
     lazy var synthesizer = AVSpeechSynthesizer()
     var speechUtterance:AVSpeechUtterance?
+    var delegate:SpeakingBotDelegate?
     init(postData: [String : Any], apiName:String) {
         self.postData = postData
         self.apiName = apiName
@@ -34,8 +42,9 @@ class SpeakingBotViewModel{
         request.addValue("Token 0f9af22e67ff1923b61d9fb214a80f7541f7f306", forHTTPHeaderField: "Authorization")
         
         
-        let task = URLSession.shared.dataTask(with: request) { data, response, error in
+        let task = URLSession.shared.dataTask(with: request) {[weak self] data, response, error in
             guard let data = data, error == nil else {
+                self?.delegate?.updateRepSpeed()
                 print(error?.localizedDescription ?? "No data")
                 return
             }
@@ -45,14 +54,23 @@ class SpeakingBotViewModel{
             //            }
             do{
                 let decodedData = try JSONDecoder().decode(Feedback.self, from: data)
+                
+                if let accuracy = decodedData.data.accuracy, let bodyPartColor = decodedData.data.bodyPartsColor{
+                    self?.delegate?.updateAccuracy(with: (accuracy*100))
+                    self?.delegate?.updateColorsForBodyPart(bodyParts: bodyPartColor)
+                    self?.delegate?.updateRepSpeed()
+                }
+                
+                
                 for feedbackResult in decodedData.data.result {
                     if feedbackResult.messageType == "negative" {
-                        self.speak(text: feedbackResult.voiceTitle)
+                        self?.speak(text: feedbackResult.voiceTitle)
                     }
                     print("\(feedbackResult.messageType) : \(feedbackResult.voiceTitle)")
                 }
             } catch{
                 print(error)
+                
             }
         }
         task.resume()
@@ -63,7 +81,6 @@ class SpeakingBotViewModel{
         DispatchQueue.global(qos: .background).sync{
             synthesizer.speak(speechUtterance ?? AVSpeechUtterance(string: "negative"))
         }
-        
     }
     
 }
