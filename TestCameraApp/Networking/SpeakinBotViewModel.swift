@@ -11,7 +11,6 @@ import AVFoundation
 protocol SpeakingBotDelegate{
     func updateAccuracy(with accuracy:Double?)
     func updateColorsForBodyPart(bodyParts:BodyPartsColor)
-    func updateRepSpeed()
 }
 
 class SpeakingBotViewModel{
@@ -44,7 +43,6 @@ class SpeakingBotViewModel{
         
         let task = URLSession.shared.dataTask(with: request) {[weak self] data, response, error in
             guard let data = data, error == nil else {
-                self?.delegate?.updateRepSpeed()
                 print(error?.localizedDescription ?? "No data")
                 return
             }
@@ -58,7 +56,6 @@ class SpeakingBotViewModel{
                 if let accuracy = decodedData.data.accuracy, let bodyPartColor = decodedData.data.bodyPartsColor{
                     self?.delegate?.updateAccuracy(with: (accuracy*100))
                     self?.delegate?.updateColorsForBodyPart(bodyParts: bodyPartColor)
-                    self?.delegate?.updateRepSpeed()
                 }
                 
                 

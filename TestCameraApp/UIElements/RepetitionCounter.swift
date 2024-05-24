@@ -11,6 +11,7 @@ import MLKit
 protocol RepetitionCountUIUpdateDelegate{
     func getRepCount(rep:String)
     func didCompletePoses()
+    func updateRepSpeed(with speed:Float, secondsTaken:Int)
 }
 
 struct ExerciseAngles:Codable{
@@ -25,14 +26,21 @@ class RepetitionCounter:UIView{
     var totalReps:String
     var noOfReps:String = "0"
     var repDelegate:RepetitionCountUIUpdateDelegate?
+    var repSpeed:Int
+    
+    var timer:Timer?
+    var seconds:Int = 0
+    var repsChanged:Bool = false
+    
     private var startIndicator:Bool = false
     var viewController:ViewController?
-    init(muscleGroup: [String], startAngle: ExerciseAngles, endAngle: ExerciseAngles, totalReps: String, vc:ViewController) {
+    init(muscleGroup: [String], startAngle: ExerciseAngles, endAngle: ExerciseAngles, totalReps: String, repSpeed:Int, vc:ViewController) {
         self.muscleGroup = muscleGroup
         self.startAngle = startAngle
         self.endAngle = endAngle
         self.totalReps = totalReps
         self.viewController = vc
+        self.repSpeed = repSpeed
         super.init(frame: .zero)
         setupDelegate()
     }
@@ -45,6 +53,8 @@ class RepetitionCounter:UIView{
         if Int(noOfReps)! >= Int(totalReps)!{
             //print("Completed")
             self.repDelegate?.didCompletePoses()
+            timer?.invalidate()
+            timer = nil
         } else {
             self.repDelegate?.getRepCount(rep:noOfReps)
             //print("\(noOfReps) / \(totalReps)")
@@ -106,6 +116,7 @@ extension RepetitionCounter:PoseDataDelegate{
         //Step3: CHECK THE CONDITIONS AND UPDATE THE GLOBAL VARIABLES
         if startIndicator && (endAngleRange1.contains(Int(angle)) || endAngleRange2.contains(Int(angle))) {
             noOfReps = "\(Int(noOfReps)!+1)"
+            repsChanged = true
             startIndicator = false
         }
         if !startIndicator {
@@ -211,6 +222,21 @@ extension RepetitionCounter:PoseDataDelegate{
 extension RepetitionCounter{
     private func setupDelegate(){
         self.viewController?.poseDelegate = self
+        timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+        timer?.fire()
+    }
+    
+    @objc private func timerFired(){
+        seconds += 1
+        
+        if repsChanged{
+            let repSpeed = (Float(seconds)/Float(repSpeed))*0.5
+            self.repDelegate?.updateRepSpeed(with: repSpeed, secondsTaken: seconds)
+            
+            repsChanged = false
+            seconds = 0
+        }
+        
     }
 }
 

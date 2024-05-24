@@ -40,8 +40,24 @@ class ViewController: UIViewController {
     }()
     
     
-    //MARK: The Variable which defined if it is a Rep based or timer based exercise
-    let typeOfExercise:String = "reps"
+    //MARK: These Variable Should be define at the start while initializing.
+    var typeOfExercise:String = "reps"
+    var instructionLabel = "put your phone in vertical direction"
+    var gifURL:String = "http://www.gifbin.com/bin/4802swswsw04.gif"
+    var apiName:String = "lateral_raises"
+    var muscleGroupForReps:[String] = [
+        "SHOULDER",
+        "HIP",
+        "WRIST"
+    ]
+    var exerciseStartAngle:ExerciseAngles = ExerciseAngles(angle_1: [75,120], angle_2: [250,295])
+    var exerciseEndAngle:ExerciseAngles = ExerciseAngles(angle_1: [0,35], angle_2: [325,360])
+    var totalRepsToBeCompleted:String = "15"
+    var caloriesBurnPerRep:Int = 2
+    var repSpeedPerRep:Int = 4
+    //MARK: Video rotation based on Portrait or Landscape
+    var isPortrait:Bool = true
+    
     
     //MARK: Vision Variables
     //    //Setting up the ImageView to display video
@@ -128,6 +144,7 @@ class ViewController: UIViewController {
     var exerciseTimeCounter:ExerciseCountdownViewController?
     var exerciseTime:Int = 30
     var accuracyStack = UIStackView()
+    var calorieBurn:Int = 0
     
     
     //MARK: To Change color of the lines based on result from speaking bot
@@ -137,15 +154,13 @@ class ViewController: UIViewController {
     
     //MARK: The welcome Tag's varible
     var importantIcon = makeImageView(withImageName: UIConstants.importantIcon, width: 83, height: 30)
-    var instructionLabel = "put your phone in vertical direction"
     var instructionStack = UIStackView()
     
     //MARK: When the user taps Record a GIF should be played
-    var gifURL:String = "http://www.gifbin.com/bin/4802swswsw04.gif"
+    
     var gifDisplayView:GifView?
     
-    //MARK: Video rotation based on Portrait or Landscape
-    var isPortrait:Bool = true
+    
 }
 
 
@@ -271,11 +286,7 @@ extension ViewController{
         
         
         if typeOfExercise == "reps"{
-            repCounter = RepetitionCounter(muscleGroup: [
-                "SHOULDER",
-                "HIP",
-                "WRIST"
-            ], startAngle: ExerciseAngles(angle_1: [75,120], angle_2: [250,295]), endAngle: ExerciseAngles(angle_1: [0,35], angle_2: [325,360]), totalReps: "15", vc: self)
+            repCounter = RepetitionCounter(muscleGroup: muscleGroupForReps, startAngle: exerciseStartAngle, endAngle: exerciseEndAngle, totalReps: totalRepsToBeCompleted, repSpeed: repSpeedPerRep, vc: self)
             repCounter?.repDelegate = self
         }
     }
@@ -666,7 +677,7 @@ extension ViewController{
                                                             "is_final": true,"saved_video":""]]
         cameraPoses = []
   //      print(completedData)
-        viewModel = SpeakingBotViewModel(postData: completedData, apiName: "lateral_raises")
+        viewModel = SpeakingBotViewModel(postData: completedData, apiName: apiName)
         viewModel?.delegate = self
         viewModel?.sendFeedback()
     }
@@ -769,9 +780,21 @@ protocol PoseDataDelegate{
 
 //MARK: Repcounter UI
 extension ViewController:RepetitionCountUIUpdateDelegate{
+    func updateRepSpeed(with speed: Float, secondsTaken: Int) {
+        if let repSpeed = repSpeed{
+           if speed >= 0 && speed < 1 {
+                repSpeed.updateProgress(speed, seconds: "\(secondsTaken)")
+            } else {
+                repSpeed.updateProgress(1, seconds: "\(secondsTaken)")
+            }
+        }
+    }
+    
     func getRepCount(rep: String) {
         if rep != repsFromDelegate{
             repsFromDelegate = rep
+            //MARK: Place where calorie Burn is calculated
+            calorieBurnCalculator(reps: Int(rep)!)
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {return}
                 self.removeStack()
@@ -802,7 +825,7 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         wrapperView.removeFromSuperview()
     }
     
-    func setupRepCounterUI(with reps: String = "0", accuracy: Double = 0.0, calories: Int = 0) {
+    func setupRepCounterUI(with reps: String = "0", accuracy: Double = 0.0) {
         guard let repSpeed = repSpeed else { return }
         
         // Add repSpeed to the main view and set its constraints
@@ -817,7 +840,7 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         // Create the exercise data views
         let repCounter = exerciseDataView(for: .Reps, mainValueToDisplay: "\(reps)", addedValue: "/ 15")
         accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: String(format: "%.0f", accuracy), addedValue: "%")
-        let caloriesView = exerciseDataView(for: .Calories, mainValueToDisplay: "\(calories)", addedValue: "cal")
+        let caloriesView = exerciseDataView(for: .Calories, mainValueToDisplay: "\(calorieBurn)", addedValue: "cal")
         
         // Add the exercise data views to the stack view
         stack.addArrangedSubview(repCounter)
@@ -897,7 +920,9 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         return stack
     }
 
-
+    func calorieBurnCalculator(reps:Int){
+        self.calorieBurn = reps*caloriesBurnPerRep
+    }
 }
 
 //MARK: Time Counter UI and Delegate
@@ -936,12 +961,6 @@ extension ViewController:ExerciseCountdownDelegate{
 //MARK: Spraking Bot Delegate
 
 extension ViewController:SpeakingBotDelegate{
-    func updateRepSpeed() {
-        if let repSpeed = repSpeed{
-            repSpeed.updateProgress(0.5, seconds: "1.5")
-        }
-    }
-    
     func updateColorsForBodyPart(bodyParts: BodyPartsColor) {
             self.redColorLines = bodyParts.red
             self.greenColorLines = bodyParts.green
