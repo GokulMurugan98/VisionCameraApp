@@ -71,10 +71,10 @@ public class UIUtilities {
         let zColorRange: CGFloat = farZExtent - nearZExtent
         var nearZColor = UIColor.white
         var farZColor = UIColor.white
-//        var red_lines_part:[String] = []
-//        var green_lines_part:[String] = []
-//        var red_lines:[[String]] = [[]]
-//        var green_lines:[[String]] = [[]]
+        var red_lines_part:[String] = []
+        var green_lines_part:[String] = []
+        var red_lines:[[String]] = [[]]
+        var green_lines:[[String]] = [[]]
         //Assigning the data from Speaking bot delegate feedback to the desired variables
         
         //Appending the values that the function returns when the function returns the array of values if we pass a string
@@ -83,21 +83,21 @@ public class UIUtilities {
         // This is needed becaus for us to draw the required coloured line we need to check if the values are similar if not we can pring White color.
         
         
-//        if let red = redLines{
-//            red_lines_part = red
-//            for red in red_lines_part{
-//                red_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: red))
-//            }
-//        }
-//        
-//        
-//        
-//        if let green = greenLines{
-//            green_lines_part = green
-//            for green in green_lines_part{
-//                green_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: green))
-//            }
-//        }
+        if let red = redLines{
+            red_lines_part = red
+            for red in red_lines_part{
+                red_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: red))
+            }
+        }
+        
+        
+        
+        if let green = greenLines{
+            green_lines_part = green
+            for green in green_lines_part{
+                green_lines.append(UIUtilities().returnPointsBasedOnBodyPart(bodyPartName: green))
+            }
+        }
         
         
         
@@ -124,21 +124,21 @@ public class UIUtilities {
                 
                 //Looping through all the values in the red_lines variable and checking if this is the line we have to change the desired color accoring to feedback.
                 
-//                for x in red_lines{
-//                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
-//                        farZColor = UIColor.red
-//                        nearZColor = UIColor.red
-//                    }
-//                }
-//                
-//                
-//                
-//                for x in green_lines{
-//                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
-//                        farZColor = UIColor.green
-//                        nearZColor = UIColor.green
-//                    }
-//                }
+                for x in red_lines{
+                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
+                        farZColor = UIColor.red
+                        nearZColor = UIColor.red
+                    }
+                }
+                
+                
+                
+                for x in green_lines{
+                    if x.contains(startLandmarkType.rawValue)  && x.contains(endLandmarkType.rawValue){
+                        farZColor = UIColor.green
+                        nearZColor = UIColor.green
+                    }
+                }
                 
                 
                 let startColor = UIUtilities.interpolatedColor(

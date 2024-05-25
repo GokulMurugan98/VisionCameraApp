@@ -21,6 +21,7 @@
 		92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */; };
 		92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */; };
 		92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A732BE4BDFD00C9E230 /* Feedback.swift */; };
+		92D74B172C01BCFD00648F0F /* TimeOrRepSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D74B162C01BCFD00648F0F /* TimeOrRepSelection.swift */; };
 		92F2E3E32BEB44AB0058BC3F /* CircularProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */; };
 		92F2E3E62BEC9BF70058BC3F /* RepetitionCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */; };
 		92FA6E9C2BEA07D900623664 /* CountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92FA6E9B2BEA07D900623664 /* CountdownViewController.swift */; };
@@ -44,6 +45,7 @@
 		92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtilities.swift; sourceTree = "<group>"; };
 		92A17A712BE4BDD700C9E230 /* SpeakinBotViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeakinBotViewModel.swift; sourceTree = "<group>"; };
 		92A17A732BE4BDFD00C9E230 /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
+		92D74B162C01BCFD00648F0F /* TimeOrRepSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeOrRepSelection.swift; sourceTree = "<group>"; };
 		92F2E3E22BEB44AB0058BC3F /* CircularProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CircularProgressView.swift; sourceTree = "<group>"; };
 		92F2E3E52BEC9BF70058BC3F /* RepetitionCounter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepetitionCounter.swift; sourceTree = "<group>"; };
 		92FA6E9B2BEA07D900623664 /* CountdownViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CountdownViewController.swift; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 				9291FCD62BF738B7004D4110 /* VerticalProgressView.swift */,
 				926D65122BFADC4900803355 /* Constants.swift */,
 				926D65142BFB064500803355 /* GifView.swift */,
+				92D74B162C01BCFD00648F0F /* TimeOrRepSelection.swift */,
 			);
 			path = UIElements;
 			sourceTree = "<group>";
@@ -286,6 +289,7 @@
 				92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */,
 				92A17A742BE4BDFD00C9E230 /* Feedback.swift in Sources */,
 				926D65152BFB064500803355 /* GifView.swift in Sources */,
+				92D74B172C01BCFD00648F0F /* TimeOrRepSelection.swift in Sources */,
 				92A17A6F2BE4A57E00C9E230 /* UIUtilities.swift in Sources */,
 				92F2E3E62BEC9BF70058BC3F /* RepetitionCounter.swift in Sources */,
 				92A17A722BE4BDD700C9E230 /* SpeakinBotViewModel.swift in Sources */,

@@ -39,6 +39,8 @@ class ViewController: UIViewController {
         return button
     }()
     
+    var selectionForExercise:TimeOrRepSelection?
+    
     
     //MARK: These Variable Should be define at the start while initializing.
     var typeOfExercise:String = "reps"
@@ -56,7 +58,7 @@ class ViewController: UIViewController {
     var caloriesBurnPerRep:Int = 2
     var repSpeedPerRep:Int = 4
     //MARK: Video rotation based on Portrait or Landscape
-    var isPortrait:Bool = true
+    var isPortrait:Bool = false
     
     
     //MARK: Vision Variables
@@ -171,11 +173,6 @@ extension ViewController{
     override func viewDidLoad() {
         super.viewDidLoad()
         //MARK: Entry Point
-//        if isPortrati{
-//            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
-//        } else {
-//            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
-//        }
         
         checkPermission()
         shutterButtuon.addTarget(self, action: #selector(recordPoses), for: .touchUpInside)
@@ -266,7 +263,7 @@ extension ViewController{
     //    }
     //This function is called when the shutter button is tapped
     @objc func recordPoses(){
-        print("Shutter Button Tapped")
+        
         shutterButtuon.removeFromSuperview()
         timerRepSelection.removeFromSuperview()
         importantIcon.removeFromSuperview()
@@ -294,7 +291,19 @@ extension ViewController{
     //This function is called when the shutter button is tapped
     @objc func selectRepsOrTime(){
         print("Reps / Timer Button Tapped")
-        
+        //MARK: Place where we draw the view for rep selection
+        selectionForExercise = TimeOrRepSelection(type: typeOfExercise)
+        selectionForExercise?.delegate = self
+        if let selectionView = selectionForExercise{
+            selectionView.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview(selectionView)
+            NSLayoutConstraint.activate([
+                selectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                selectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
+                selectionView.widthAnchor.constraint(equalToConstant: 300),
+                selectionView.heightAnchor.constraint(equalToConstant: 250)
+            ])
+        }
     }
 }
 //MARK: Functions needed for initial UI Setup
@@ -755,7 +764,6 @@ extension ViewController:CountdownDelegate{
                 ex.startTimer(with: exerciseTime)
             }
         }
-        addWrapperView()
     }
     
     @objc func timerFired(){
@@ -799,8 +807,7 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
                 guard let self = self else {return}
                 self.removeStack()
                 self.wrapperView = UIView()
-                self.setupRepCounterUI(with: self.repsFromDelegate, accuracy: accuracyFromDelegate)
-                self.addWrapperView()
+                self.setupRepCounterUI(with: self.repsFromDelegate)
             }
         }
     }
@@ -815,17 +822,11 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         sendPoses()
     }
     
-    func addWrapperView(){
-        wrapperView.translatesAutoresizingMaskIntoConstraints = false
-        wrapperView.layer.cornerRadius = 10
-        wrapperView.backgroundColor = .black.withAlphaComponent(0.4)
-    }
-    
     func removeStack(){
         wrapperView.removeFromSuperview()
     }
     
-    func setupRepCounterUI(with reps: String = "0", accuracy: Double = 0.0) {
+    func setupRepCounterUI(with reps: String = "0") {
         guard let repSpeed = repSpeed else { return }
         
         // Add repSpeed to the main view and set its constraints
@@ -838,8 +839,8 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         stack.translatesAutoresizingMaskIntoConstraints = false
         
         // Create the exercise data views
-        let repCounter = exerciseDataView(for: .Reps, mainValueToDisplay: "\(reps)", addedValue: "/ 15")
-        accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: String(format: "%.0f", accuracy), addedValue: "%")
+        let repCounter = exerciseDataView(for: .Reps, mainValueToDisplay: "\(reps)", addedValue: "/ \(totalRepsToBeCompleted)")
+        updateAccuracy(with: accuracyFromDelegate)
         let caloriesView = exerciseDataView(for: .Calories, mainValueToDisplay: "\(calorieBurn)", addedValue: "cal")
         
         // Add the exercise data views to the stack view
@@ -851,9 +852,10 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         stack.setCustomSpacing(5, after: repCounter)
         stack.setCustomSpacing(5, after: accuracyStack)
         
-        wrapperView.addSubview(stack)
         wrapperView.translatesAutoresizingMaskIntoConstraints = false
-        wrapperView.backgroundColor = .clear
+        wrapperView.layer.cornerRadius = 10
+        wrapperView.backgroundColor = .black.withAlphaComponent(0.4)
+        wrapperView.addSubview(stack)
         
         // Add the wrapper view to the main view
         view.addSubview(wrapperView)
@@ -887,6 +889,10 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
                 repSpeed.heightAnchor.constraint(equalToConstant: 200)
             ])
         }
+    }
+    
+    func updateAccuracy(with accuracy:Double){
+        accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: String(format: "%.0f", accuracy), addedValue: "%")
     }
 
 
@@ -941,9 +947,9 @@ extension ViewController:ExerciseCountdownDelegate{
     }
     
     
-    func setupTimeCounterUI(){
+    func setupTimeCounterUI(accuracy:Double = 0.0){
         
-        accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: "20", addedValue: "%")
+        updateAccuracy(with: accuracy)
         accuracyStack.translatesAutoresizingMaskIntoConstraints = false
         // Add the wrapper view to the main view
         self.view.addSubview(accuracyStack)
@@ -951,14 +957,11 @@ extension ViewController:ExerciseCountdownDelegate{
         NSLayoutConstraint.activate([
             accuracyStack.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
             accuracyStack.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: 10)
-        
-        
-        
         ])
     }
 }
 
-//MARK: Spraking Bot Delegate
+//MARK: Speaking Bot Delegate
 
 extension ViewController:SpeakingBotDelegate{
     func updateColorsForBodyPart(bodyParts: BodyPartsColor) {
@@ -971,9 +974,36 @@ extension ViewController:SpeakingBotDelegate{
             accuracyFromDelegate = accuracy!
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else {return}
-                self.removeStack()
-                self.setupRepCounterUI(with: repsFromDelegate, accuracy: accuracyFromDelegate)
+                
+                if  self.typeOfExercise == "reps"{
+                    self.removeStack()
+                    self.setupRepCounterUI(with: repsFromDelegate)
+                    
+                } else {
+                    self.accuracyStack.removeFromSuperview()
+                    setupTimeCounterUI(accuracy: accuracyFromDelegate)
+                }
             }
         }
+    }
+}
+
+
+//MARK: Selection View Delegate
+
+extension ViewController:SelectionDelegate{
+    func selectedInput(input: String?) {
+        if let input = input{
+            if typeOfExercise == "reps"{
+                totalRepsToBeCompleted = input
+            } else {
+                exerciseTime = Int(input)!
+            }
+            
+            selectionForExercise?.removeFromSuperview()
+            selectionForExercise = nil
+            print("\(totalRepsToBeCompleted)")
+        }
+        
     }
 }
