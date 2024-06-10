@@ -14,7 +14,7 @@
 		929E44D42BF491FC00F0C04B /* ExerciseCountdownViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 929E44D32BF491FC00F0C04B /* ExerciseCountdownViewController.swift */; };
 		92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5A2BE4267900C9E230 /* AppDelegate.swift */; };
 		92A17A5D2BE4267900C9E230 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */; };
-		92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5E2BE4267900C9E230 /* ViewController.swift */; };
+		92A17A5F2BE4267900C9E230 /* VisionCameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92A17A5E2BE4267900C9E230 /* VisionCameraViewController.swift */; };
 		92A17A622BE4267900C9E230 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 92A17A612BE4267900C9E230 /* Base */; };
 		92A17A642BE4267A00C9E230 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 92A17A632BE4267A00C9E230 /* Assets.xcassets */; };
 		92A17A672BE4267A00C9E230 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 92A17A662BE4267A00C9E230 /* Base */; };
@@ -37,7 +37,7 @@
 		92A17A572BE4267900C9E230 /* TestCameraApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestCameraApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92A17A5A2BE4267900C9E230 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		92A17A5C2BE4267900C9E230 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		92A17A5E2BE4267900C9E230 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		92A17A5E2BE4267900C9E230 /* VisionCameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VisionCameraViewController.swift; sourceTree = "<group>"; };
 		92A17A612BE4267900C9E230 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		92A17A632BE4267A00C9E230 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		92A17A662BE4267A00C9E230 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -99,9 +99,7 @@
 				92A17A632BE4267A00C9E230 /* Assets.xcassets */,
 				92A17A652BE4267A00C9E230 /* LaunchScreen.storyboard */,
 				92A17A682BE4267A00C9E230 /* Info.plist */,
-				92A17A702BE4BDB700C9E230 /* Vision Camera View */,
-				92A17A752BE4BE1B00C9E230 /* Networking */,
-				92F2E3E42BEB45270058BC3F /* UIElements */,
+				92C3CE632C05A91E0073DBEF /* Camera */,
 			);
 			path = TestCameraApp;
 			sourceTree = "<group>";
@@ -109,10 +107,11 @@
 		92A17A702BE4BDB700C9E230 /* Vision Camera View */ = {
 			isa = PBXGroup;
 			children = (
-				92A17A5E2BE4267900C9E230 /* ViewController.swift */,
+				92A17A5E2BE4267900C9E230 /* VisionCameraViewController.swift */,
 				92A17A6E2BE4A57E00C9E230 /* UIUtilities.swift */,
 			);
 			name = "Vision Camera View";
+			path = ..;
 			sourceTree = "<group>";
 		};
 		92A17A752BE4BE1B00C9E230 /* Networking */ = {
@@ -122,6 +121,16 @@
 				92A17A732BE4BDFD00C9E230 /* Feedback.swift */,
 			);
 			path = Networking;
+			sourceTree = "<group>";
+		};
+		92C3CE632C05A91E0073DBEF /* Camera */ = {
+			isa = PBXGroup;
+			children = (
+				92A17A702BE4BDB700C9E230 /* Vision Camera View */,
+				92A17A752BE4BE1B00C9E230 /* Networking */,
+				92F2E3E42BEB45270058BC3F /* UIElements */,
+			);
+			path = Camera;
 			sourceTree = "<group>";
 		};
 		92F2E3E42BEB45270058BC3F /* UIElements */ = {
@@ -283,7 +292,7 @@
 			files = (
 				929E44D42BF491FC00F0C04B /* ExerciseCountdownViewController.swift in Sources */,
 				92FA6E9C2BEA07D900623664 /* CountdownViewController.swift in Sources */,
-				92A17A5F2BE4267900C9E230 /* ViewController.swift in Sources */,
+				92A17A5F2BE4267900C9E230 /* VisionCameraViewController.swift in Sources */,
 				92F2E3E32BEB44AB0058BC3F /* CircularProgressView.swift in Sources */,
 				9291FCD72BF738B7004D4110 /* VerticalProgressView.swift in Sources */,
 				92A17A5B2BE4267900C9E230 /* AppDelegate.swift in Sources */,

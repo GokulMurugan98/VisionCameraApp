@@ -9,7 +9,7 @@ import UIKit
 import AVFoundation
 import MLKit
 
-class ViewController: UIViewController {
+class VisionCameraViewController: UIViewController {
     
     //MARK: Simple Camera Variables
     
@@ -22,7 +22,7 @@ class ViewController: UIViewController {
     //Initializing session queue
     private lazy var sessionQueue = DispatchQueue(label: Constant.sessionQueueLabel)
     
-    let shutterButtuon:UIButton = {
+    let shutterButton:UIButton = {
         let button = UIButton(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         button.layer.cornerRadius = 50
         button.layer.borderWidth = 5
@@ -35,6 +35,15 @@ class ViewController: UIViewController {
         button.layer.cornerRadius = 25
         button.layer.borderWidth = 3
         button.setImage(UIImage(systemName: "timer")?.withTintColor(.white), for: .normal)
+        button.layer.borderColor = UIColor.white.cgColor
+        return button
+    }()
+    
+    let cameraSwitchButton:UIButton = {
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        button.layer.cornerRadius = 25
+        button.layer.borderWidth = 3
+        button.setImage(UIImage(systemName: "arrow.triangle.2.circlepath")?.withTintColor(.white), for: .normal)
         button.layer.borderColor = UIColor.white.cgColor
         return button
     }()
@@ -91,6 +100,8 @@ class ViewController: UIViewController {
     var cameraPoses = [[[String: Any]]]()
     
     var isPoseDetectionStart:Bool = false
+    
+    var cameraSwitchButtonUnChanged:Bool = true
     
     let poseTypeOrder: [PoseType] = [
         .Nose,
@@ -168,15 +179,16 @@ class ViewController: UIViewController {
 
 //Camera Related Codes
 
-extension ViewController{
+extension VisionCameraViewController{
     //Adding Sub Views to the Main View
     override func viewDidLoad() {
         super.viewDidLoad()
         //MARK: Entry Point
         
         checkPermission()
-        shutterButtuon.addTarget(self, action: #selector(recordPoses), for: .touchUpInside)
+        shutterButton.addTarget(self, action: #selector(recordPoses), for: .touchUpInside)
         timerRepSelection.addTarget(self, action: #selector(selectRepsOrTime), for: .touchUpInside)
+        cameraSwitchButton.addTarget(self, action: #selector(switchCamera), for: .touchUpInside)
         createInformationStack()
         // Register for device orientation changes
         NotificationCenter.default.addObserver(self, selector: #selector(orientationChanged), name: UIDevice.orientationDidChangeNotification, object: nil)
@@ -184,10 +196,12 @@ extension ViewController{
     //Setting Up layers for the camera
     override func viewDidLayoutSubviews() {
         previewLayer.frame = view.bounds
-        shutterButtuon.center = CGPoint(x: view.frame.size.width/2,
-                                        y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
-        timerRepSelection.center = CGPoint(x: view.safeAreaInsets.left+50,
-                                        y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
+        shutterButton.center = CGPoint(x: view.frame.size.width/2,
+                                       y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
+        timerRepSelection.center = CGPoint(x: view.safeAreaLayoutGuide.layoutFrame.minX + 50,
+                                           y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
+        cameraSwitchButton.center = CGPoint(x: view.safeAreaLayoutGuide.layoutFrame.maxX - 50,
+                                            y: isPortrait ? view.frame.size.height - 100 : view.frame.size.height - 65 )
         
     }
     
@@ -198,6 +212,7 @@ extension ViewController{
             print("not working")
             return
         }
+        
         if connection.isVideoOrientationSupported {
             if isPortrait {
                 connection.videoOrientation = .portrait
@@ -231,9 +246,9 @@ extension ViewController{
         }
     }
     
-   
-
-
+    
+    
+    
     
     
     
@@ -264,7 +279,7 @@ extension ViewController{
     //This function is called when the shutter button is tapped
     @objc func recordPoses(){
         
-        shutterButtuon.removeFromSuperview()
+        shutterButton.removeFromSuperview()
         timerRepSelection.removeFromSuperview()
         importantIcon.removeFromSuperview()
         instructionStack.removeFromSuperview()
@@ -305,9 +320,17 @@ extension ViewController{
             ])
         }
     }
+    
+    @objc func switchCamera(){
+        removeView()
+        self.isUsingFrontCamera.toggle()
+        setupView()
+        
+    }
+    
 }
 //MARK: Functions needed for initial UI Setup
-extension ViewController{
+extension VisionCameraViewController{
     
     private func createInformationStack() {
         let mainStack = makeStackView(withOrientation: .horizontal)
@@ -328,7 +351,7 @@ extension ViewController{
         // Make sure 'importantIcon' is defined
         instructionStack.addSubview(mainStack)
         
-       
+        
         NSLayoutConstraint.activate([
             importantIcon.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
             importantIcon.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 10)
@@ -360,7 +383,7 @@ extension ViewController{
 
 
 //MARK: Functions needed for Vision Camera
-extension ViewController{
+extension VisionCameraViewController{
     
     //Base code to setup all the functionalities needed to record the lines over the person
     func setupView(){
@@ -371,6 +394,14 @@ extension ViewController{
         setUpAnnotationOverlayView()
         setUpCaptureSessionOutput()
         setUpCaptureSessionInput()
+    }
+    
+    func removeView(){
+        previewLayer.removeFromSuperlayer()
+        previewLayer = nil
+        annotationOverlayView.removeFromSuperview()
+        captureSession.stopRunning()
+        captureSession = AVCaptureSession()
     }
     
     //Start the video camera View
@@ -493,9 +524,10 @@ extension ViewController{
                 DispatchQueue.main.sync {
                     strongSelf.startSession()
                     strongSelf.orientationChanged()
-                    strongSelf.view.addSubview(strongSelf.shutterButtuon)
+                    strongSelf.view.addSubview(strongSelf.shutterButton)
                     strongSelf.view.addSubview(strongSelf.timerRepSelection)
-                    
+                    strongSelf.view.addSubview(strongSelf.cameraSwitchButton)
+                    strongSelf.cameraSwitchButtonUnChanged.toggle()
                 }
             } catch {
                 print("Failed to create capture device input: \(error.localizedDescription)")
@@ -593,7 +625,7 @@ extension ViewController{
     
 }
 
-extension ViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
+extension VisionCameraViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
     
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask{
         if isPortrait{
@@ -639,7 +671,7 @@ extension ViewController:AVCaptureVideoDataOutputSampleBufferDelegate{
     }
 }
 
-extension ViewController{
+extension VisionCameraViewController{
     
     private func getPoseData(pose: Pose) {
         let keyPoints = mapBasedOnEnumSequence(frames: pose.landmarks)
@@ -685,7 +717,7 @@ extension ViewController{
                                                             "accuracy_score": 40,
                                                             "is_final": true,"saved_video":""]]
         cameraPoses = []
-  //      print(completedData)
+        //      print(completedData)
         viewModel = SpeakingBotViewModel(postData: completedData, apiName: apiName)
         viewModel?.delegate = self
         viewModel?.sendFeedback()
@@ -738,13 +770,13 @@ private enum Constant {
 }
 
 //MARK: Countdown Delegate
-extension ViewController:CountdownDelegate{
+extension VisionCameraViewController:CountdownDelegate{
     func didFinishCountdown() {
         gifDisplayView?.removeFromSuperview()
         isPoseDetectionStart = true
         if typeOfExercise == "reps"{
-//            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
-//            timer?.fire()
+            //            timer = Timer.scheduledTimer(timeInterval: 1.0, target: self, selector: #selector(timerFired), userInfo: nil, repeats: true)
+            //            timer?.fire()
             exerciseTimeCounter = ExerciseCountdownViewController()
             repSpeed = VerticalProgressView()
             setupRepCounterUI()
@@ -768,17 +800,17 @@ extension ViewController:CountdownDelegate{
     
     @objc func timerFired(){
         currentTime += 1
-//        if currentTime > 30{
-//            timer?.invalidate()
-//            timer = nil
-//            isPoseDetectionStart = false
-//        } else 
+        //        if currentTime > 30{
+        //            timer?.invalidate()
+        //            timer = nil
+        //            isPoseDetectionStart = false
+        //        } else
         if (currentTime%10) == 0 {
             sendPoses()
         }
-//        else {
-//            //print(currentTime)
-//        }
+        //        else {
+        //            //print(currentTime)
+        //        }
     }
 }
 
@@ -787,10 +819,10 @@ protocol PoseDataDelegate{
 }
 
 //MARK: Repcounter UI
-extension ViewController:RepetitionCountUIUpdateDelegate{
+extension VisionCameraViewController:RepetitionCountUIUpdateDelegate{
     func updateRepSpeed(with speed: Float, secondsTaken: Int) {
         if let repSpeed = repSpeed{
-           if speed >= 0 && speed < 1 {
+            if speed >= 0 && speed < 1 {
                 repSpeed.updateProgress(speed, seconds: "\(secondsTaken)")
             } else {
                 repSpeed.updateProgress(1, seconds: "\(secondsTaken)")
@@ -894,8 +926,8 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
     func updateAccuracy(with accuracy:Double){
         accuracyStack = exerciseDataView(for: .Accuracy, mainValueToDisplay: String(format: "%.0f", accuracy), addedValue: "%")
     }
-
-
+    
+    
     func exerciseDataView(for activity: ActivityType, mainValueToDisplay: String?, addedValue: String?) -> UIStackView {
         let stack = makeStackView(withOrientation: .vertical)
         let horizontalStack1 = makeStackView(withOrientation: .horizontal, spacing: 2)
@@ -925,7 +957,7 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
         
         return stack
     }
-
+    
     func calorieBurnCalculator(reps:Int){
         self.calorieBurn = reps*caloriesBurnPerRep
     }
@@ -933,7 +965,7 @@ extension ViewController:RepetitionCountUIUpdateDelegate{
 
 //MARK: Time Counter UI and Delegate
 
-extension ViewController:ExerciseCountdownDelegate{
+extension VisionCameraViewController:ExerciseCountdownDelegate{
     func didFinishExerciseTimerCountdown() {
         isPoseDetectionStart = false
         //MARK: Send one last time all the pose data
@@ -963,10 +995,10 @@ extension ViewController:ExerciseCountdownDelegate{
 
 //MARK: Speaking Bot Delegate
 
-extension ViewController:SpeakingBotDelegate{
+extension VisionCameraViewController:SpeakingBotDelegate{
     func updateColorsForBodyPart(bodyParts: BodyPartsColor) {
-            self.redColorLines = bodyParts.red
-            self.greenColorLines = bodyParts.green
+        self.redColorLines = bodyParts.red
+        self.greenColorLines = bodyParts.green
     }
     
     func updateAccuracy(with accuracy: Double?) {
@@ -991,7 +1023,7 @@ extension ViewController:SpeakingBotDelegate{
 
 //MARK: Selection View Delegate
 
-extension ViewController:SelectionDelegate{
+extension VisionCameraViewController:SelectionDelegate{
     func selectedInput(input: String?) {
         if let input = input{
             if typeOfExercise == "reps"{

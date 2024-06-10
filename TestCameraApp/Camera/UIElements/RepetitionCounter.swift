@@ -33,8 +33,8 @@ class RepetitionCounter:UIView{
     var repsChanged:Bool = false
     
     private var startIndicator:Bool = false
-    var viewController:ViewController?
-    init(muscleGroup: [String], startAngle: ExerciseAngles, endAngle: ExerciseAngles, totalReps: String, repSpeed:Int, vc:ViewController) {
+    var viewController:VisionCameraViewController?
+    init(muscleGroup: [String], startAngle: ExerciseAngles, endAngle: ExerciseAngles, totalReps: String, repSpeed:Int, vc:VisionCameraViewController) {
         self.muscleGroup = muscleGroup
         self.startAngle = startAngle
         self.endAngle = endAngle
